@@ -37,7 +37,7 @@ jobs:
   analyze-android:
     name: Analyze (Android)
     runs-on: ubuntu-latest
-    if: hashFiles('examples/android/gradlew') != ''
+    if: ${{ hashFiles('examples/android/gradlew') != '' }}
     permissions:
       actions: read
       contents: read
