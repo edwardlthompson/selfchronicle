@@ -13,6 +13,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  detect-optional:
+    name: Detect optional stacks
+    runs-on: ubuntu-latest
+    outputs:
+      android: ${{ steps.stacks.outputs.android }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: stacks
+        run: |
+          if [ -f examples/android/gradlew ]; then
+            echo "android=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "android=false" >> "$GITHUB_OUTPUT"
+          fi
+
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
@@ -37,7 +52,8 @@ jobs:
   analyze-android:
     name: Analyze (Android)
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('examples/android/gradlew') != '' }}
+    needs: detect-optional
+    if: needs.detect-optional.outputs.android == 'true'
     permissions:
       actions: read
       contents: read
