@@ -15,6 +15,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0](https://github.com/edwardlthompson/selfchronicle/compare/v0.16.0...v0.17.0) (2026-07-26)
+
+
+### Added
+
+* **web:** compact bio chips, IMDb enrich, occupations label ([78f0632](https://github.com/edwardlthompson/selfchronicle/commit/78f0632557d7d07197ecc5e1b6258b7fcee83e7e))
+
+
+### Fixed
+
+* **ci:** gate android jobs via path-changes outputs ([da33120](https://github.com/edwardlthompson/selfchronicle/commit/da33120b0408b1357b43e3f926cbcbe8b24f712f))
+* **ci:** skip pruned android jobs; update welcome e2e smoke ([b60048f](https://github.com/edwardlthompson/selfchronicle/commit/b60048f01c4a0cf829af99d207322117c0760200))
+* **ci:** wrap hashFiles job conditions in expressions ([168a379](https://github.com/edwardlthompson/selfchronicle/commit/168a379d5267bde0502a3db94021e0531fa6198f))
+* **release:** sync template version files to 0.16.0 ([43ff465](https://github.com/edwardlthompson/selfchronicle/commit/43ff4653ce592df7764d61c2a767f6f07e1aec3c))
+* **security:** bump brace-expansion, js-yaml, postcss overrides ([bea4b1e](https://github.com/edwardlthompson/selfchronicle/commit/bea4b1e3682c50292d60e2df4669dcc0fb1da651))
+* **test:** add missing IMDb synthetic fixtures for CI ([28ec38b](https://github.com/edwardlthompson/selfchronicle/commit/28ec38b7f6324c121941e79be4e254dc043ee918))
+
+
+### Changed
+
+* **main:** release 0.15.2 ([5680018](https://github.com/edwardlthompson/selfchronicle/commit/56800184c9d155d526e36d3eac071a5dc0f7e426))
+* **main:** release 0.16.0 ([794e264](https://github.com/edwardlthompson/selfchronicle/commit/794e2647d4aaf2f37955f15abd8768698ce2205c))
+* **release:** merge origin/main for v0.1.0 release ([6cba5b0](https://github.com/edwardlthompson/selfchronicle/commit/6cba5b0b1904af2c9a510c7e0954ecffb0339ecc))
+* **release:** prepare v0.1.0 release ([72f14fa](https://github.com/edwardlthompson/selfchronicle/commit/72f14fae7ededcc5fb2ee35382657365560584f5))
+
 ## [0.16.0](https://github.com/edwardlthompson/selfchronicle/compare/v0.15.1...v0.16.0) (2026-07-26)
 
 
