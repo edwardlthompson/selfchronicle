@@ -18,6 +18,7 @@ export type WelcomeModel = {
   previewCount: number;
   sampleTitles: string[];
   hasLinksLander: boolean;
+  enrichLinkedOnCommit: boolean;
   committed: string;
   selectedFormat: string;
 };

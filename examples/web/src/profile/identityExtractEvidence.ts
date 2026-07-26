@@ -1,7 +1,8 @@
 import type { VaultDocument } from "../vault/types";
 import type { IdentityPatch } from "./identityPatch";
 import { trimBioBlurb } from "./bioCompact";
-import { extractOccupationTitles } from "./occupationTitles";
+import { extractImdbProfileUrls, inferOccupationsFromImdbEvidence } from "./imdbOccupationInference";
+import { extractOccupationTitles, flattenOccupationTitles } from "./occupationTitles";
 
 function parseGithubEvidenceBody(body: string): IdentityPatch {
   const patch: IdentityPatch = {};
@@ -40,7 +41,37 @@ function parseLinksLanderEvidence(body: string): IdentityPatch {
     const nextH2 = signals.search(/\n## [^#]/);
     if (nextH2 >= 0) signals = signals.slice(0, nextH2);
   }
-  const roles = extractOccupationTitles(signals);
+  const roles = flattenOccupationTitles([
+    ...extractOccupationTitles(signals),
+    ...inferOccupationsFromImdbEvidence(body),
+  ]);
+  if (roles.length) patch.occupations = roles;
+
+  const imdbUrls = extractImdbProfileUrls(body);
+  if (imdbUrls.length) patch.links = [...(patch.links ?? []), ...imdbUrls];
+
+  return patch;
+}
+
+function parsePageEnrichEvidence(body: string): IdentityPatch {
+  const patch: IdentityPatch = {};
+  const display = body.match(/Display name:\s*\*?\*?([^*\n]+)\*?\*?/i);
+  if (display?.[1]) patch.displayName = display[1].trim();
+  const url = body.match(/Source URL:\s*(https?:\/\/\S+)/i);
+  if (url?.[1]) patch.links = [url[1].replace(/[.,;]+$/, "")];
+
+  const signalsBlock = body.match(/## Distilled biography signals[^\n]*/i)?.[0];
+  let signals = body;
+  if (signalsBlock) {
+    const start = body.indexOf(signalsBlock) + signalsBlock.length;
+    signals = body.slice(start);
+    const nextH2 = signals.search(/\n## [^#]/);
+    if (nextH2 >= 0) signals = signals.slice(0, nextH2);
+  }
+  const roles = flattenOccupationTitles([
+    ...extractOccupationTitles(signals),
+    ...inferOccupationsFromImdbEvidence(body),
+  ]);
   if (roles.length) patch.occupations = roles;
   return patch;
 }
@@ -75,6 +106,14 @@ export function extractFromEvidence(evidence: VaultDocument[]): IdentityPatch {
     if (/personal\s*site\s*url/i.test(title) || (tags.includes("website") && /URL:/i.test(body))) {
       patch.links = [...(patch.links ?? []), ...(parseSiteUrlEvidence(body).links ?? [])];
     }
+    if (tags.includes("page_enrich") || /user-initiated page enrichment/i.test(body)) {
+      const pe = parsePageEnrichEvidence(body);
+      if (pe.displayName && !patch.displayName) patch.displayName = pe.displayName;
+      if (pe.links?.length) patch.links = [...(patch.links ?? []), ...pe.links];
+      if (pe.occupations?.length) {
+        patch.occupations = [...(patch.occupations ?? []), ...pe.occupations];
+      }
+    }
 
     const loc = body.match(/Location \(public\):\s*([^\n.]+)/i);
     if (loc?.[1] && !patch.homeAddress) patch.homeAddress = loc[1].trim();
@@ -83,6 +122,19 @@ export function extractFromEvidence(evidence: VaultDocument[]): IdentityPatch {
     if (nameVariants?.[1] && !patch.displayName) {
       patch.displayName = nameVariants[1].split(/;/)[0]!.trim();
     }
+  }
+
+  const imdbRoles: string[] = [];
+  const imdbLinks: string[] = [];
+  for (const ev of evidence) {
+    imdbRoles.push(...inferOccupationsFromImdbEvidence(ev.body));
+    imdbLinks.push(...extractImdbProfileUrls(ev.body));
+  }
+  if (imdbRoles.length) {
+    patch.occupations = flattenOccupationTitles([...(patch.occupations ?? []), ...imdbRoles]);
+  }
+  if (imdbLinks.length) {
+    patch.links = [...(patch.links ?? []), ...imdbLinks];
   }
 
   if (patch.links) patch.links = [...new Set(patch.links)];

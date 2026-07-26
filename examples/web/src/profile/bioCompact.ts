@@ -44,10 +44,21 @@ export function prioritizeLinks(links: string[]): string[] {
   return ranked.slice(0, BIO_LIMITS.links);
 }
 
+const OCCUPATION_CHIP_PRIORITY = ["Actor", "Model"] as const;
+
 export function filterOccupations(items: string[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const item of flattenOccupationTitles(items)) {
+  const flat = flattenOccupationTitles(items);
+  const prioritized = [
+    ...flat.filter((item) =>
+      OCCUPATION_CHIP_PRIORITY.some((p) => p.toLowerCase() === item.toLowerCase()),
+    ),
+    ...flat.filter(
+      (item) => !OCCUPATION_CHIP_PRIORITY.some((p) => p.toLowerCase() === item.toLowerCase()),
+    ),
+  ];
+  for (const item of prioritized) {
     if (!item || isBioNoise(item) || /https?:\/\//i.test(item)) continue;
     const key = item.toLowerCase();
     if (seen.has(key)) continue;

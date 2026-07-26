@@ -40,6 +40,10 @@ function pickList(
   if (isFieldEdited(bio, key) && stored.length) {
     return key === "links" ? prioritizeLinks(stored) : key === "occupations" ? filterOccupations(stored) : stored;
   }
+  if (key === "occupations") {
+    const merged = filterOccupations([...stored, ...ext]);
+    if (merged.length) return merged;
+  }
   if (ext.length) return ext;
   return key === "links"
     ? prioritizeLinks(stored)

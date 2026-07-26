@@ -17,6 +17,7 @@ export function defaultWelcomeModel(): WelcomeModel {
     previewCount: 0,
     sampleTitles: [],
     hasLinksLander: false,
+    enrichLinkedOnCommit: false,
     committed: "",
     selectedFormat: getImportSelectedFormat(),
   };
@@ -39,6 +40,11 @@ export function renderWelcomeView(m: WelcomeModel): string {
       <h2>${t("welcome.review_title")}</h2>
       <p class="gp-body">${t("import.review_count")}: ${m.previewCount}</p>
       ${m.hasLinksLander ? `<p class="gp-body">${t("welcome.linkslander_found")}</p>` : ""}
+      <label class="sc-field sc-welcome-enrich">
+        <input type="checkbox" data-welcome-enrich-linked ${m.enrichLinkedOnCommit ? "checked" : ""} />
+        <span>${t("welcome.enrich_linked_label")}</span>
+      </label>
+      <p class="gp-body sc-welcome-enrich-hint">${t("welcome.enrich_linked_hint")}</p>
       <ul>${samples}</ul>
       <p class="gp-body">${t("welcome.provisional")}</p>
       <button type="button" class="sc-btn" data-welcome-commit ${m.busy ? "disabled" : ""}>

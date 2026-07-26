@@ -1,5 +1,6 @@
 import type { ProfileVault } from "../vault";
 import { applySeedBundle } from "../profile/applySeed";
+import { enrichLinkedPagesFromVault } from "../profile/pageEnrich/enrichLinkedPages";
 import type { SeedBundle } from "../profile/seedBundle";
 import { bindWelcomeOutlets } from "./bindOutlets";
 import { previewSeedBundle } from "./publicGithubImport";
@@ -70,20 +71,34 @@ export function bindWelcomeSession(ctx: BindCtx): void {
   bindNav(ctx);
   bindWelcomeOutlets({ ...ctx, run });
 
+  ctx.root.querySelector<HTMLInputElement>("[data-welcome-enrich-linked]")?.addEventListener("change", (ev) => {
+    ctx.patch({ enrichLinkedOnCommit: (ev.target as HTMLInputElement).checked });
+  });
+
   ctx.root.querySelector("[data-welcome-commit]")?.addEventListener("click", () => {
     const pending = ctx.getPending();
     if (!pending) return;
     ctx.patch({ busy: true });
     ctx.onDone();
-    void applySeedBundle(ctx.vault, pending).then((counts) => {
-      ctx.setModel({
-        ...ctx.getModel(),
-        busy: false,
-        step: "done",
-        committed: `Evidence ${counts.evidence}, chapters ${counts.chapters}, facts ${counts.facts}.`,
+    void applySeedBundle(ctx.vault, pending)
+      .then(async (counts) => {
+        let enrichNote = "";
+        if (ctx.getModel().enrichLinkedOnCommit) {
+          const enrich = await enrichLinkedPagesFromVault(ctx.vault, { force: true });
+          if (enrich.enriched > 0) {
+            enrichNote = ` Enriched ${enrich.enriched} linked page(s).`;
+          } else if (enrich.attempted > 0) {
+            enrichNote = " Linked-page fetch failed; IMDb link inference may still apply.";
+          }
+        }
+        ctx.setModel({
+          ...ctx.getModel(),
+          busy: false,
+          step: "done",
+          committed: `Evidence ${counts.evidence}, chapters ${counts.chapters}, facts ${counts.facts}.${enrichNote}`,
+        });
+        ctx.setPending(null);
+        ctx.onDone();
       });
-      ctx.setPending(null);
-      ctx.onDone();
-    });
   });
 }

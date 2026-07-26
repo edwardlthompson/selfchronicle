@@ -1,6 +1,8 @@
 import type { AppShellState } from "../AppShell";
 import { identityFromForm } from "../components/profile/IdentityHeader";
+import { t } from "../i18n";
 import { resolveProfileIdentity, saveBioFromForm } from "../profile/bio";
+import { enrichLinkedPagesFromVault } from "../profile/pageEnrich/enrichLinkedPages";
 import { searchVault } from "../search/fts";
 import type { ProfileVault } from "../vault";
 import { vaultListAllDocs, vaultOnThisDay } from "../vault/profileVaultQueries";
@@ -79,5 +81,34 @@ export function bindProfileSeeds(
     void vault
       .upsertLayer("facts", "Values curiosity", "You notice and keep what matters.")
       .then(onDone);
+  });
+  bindProfileEnrich(root, vault, onDone);
+}
+
+export function bindProfileEnrich(
+  root: HTMLElement,
+  vault: ProfileVault,
+  onDone: () => void,
+): void {
+  const btn = root.querySelector<HTMLButtonElement>("[data-profile-enrich-links]");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const ok = window.confirm(t("profile.enrich_links_confirm"));
+    if (!ok) return;
+    btn.disabled = true;
+    void enrichLinkedPagesFromVault(vault, { force: true })
+      .then((result) => {
+        if (result.attempted === 0) {
+          window.alert(t("profile.enrich_links_none"));
+        } else if (result.enriched > 0) {
+          window.alert(t("profile.enrich_links_ok").replace("{count}", String(result.enriched)));
+        } else {
+          window.alert(t("profile.enrich_links_failed"));
+        }
+        onDone();
+      })
+      .finally(() => {
+        btn.disabled = false;
+      });
   });
 }

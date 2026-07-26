@@ -30,11 +30,11 @@ describe("bioCompact", () => {
       "TypeScript",
     ];
     expect(filterOccupations(items)).toEqual([
+      "Actor",
       "Teacher",
       "Photographer",
       "Engineer",
       "Tour guide",
-      "Actor",
     ]);
   });
 

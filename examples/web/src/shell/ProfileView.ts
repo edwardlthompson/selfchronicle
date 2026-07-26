@@ -50,6 +50,8 @@ export function renderProfileView(opts: {
     <h2>${t("profile.biography")}</h2>
     ${chapters}
     <button type="button" data-profile-seed-bio>${t("profile.seed_bio")}</button>
+    <button type="button" class="sc-btn" data-profile-enrich-links data-testid="profile-enrich-links">${t("profile.enrich_links")}</button>
+    <p class="sc-identity-hint" data-testid="profile-enrich-hint">${t("profile.enrich_links_hint")}</p>
     <h2>${t("profile.facts")}</h2>
     ${facts}
     <button type="button" data-profile-seed-fact>${t("profile.seed_fact")}</button>

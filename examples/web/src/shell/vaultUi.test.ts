@@ -1,6 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
-import { bindProfileSeeds, refreshVaultState } from "./vaultUi";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { bindProfileEnrich, bindProfileSeeds, refreshVaultState } from "./vaultUi";
 import type { AppShellState } from "../AppShell";
+
+vi.mock("../profile/pageEnrich/enrichLinkedPages", () => ({
+  enrichLinkedPagesFromVault: vi.fn(),
+}));
+
+import { enrichLinkedPagesFromVault } from "../profile/pageEnrich/enrichLinkedPages";
 
 describe("vaultUi", () => {
   it("refreshVaultState builds profile html", async () => {
@@ -64,5 +70,46 @@ describe("vaultUi", () => {
     root.querySelector<HTMLFormElement>("[data-profile-identity-form-el]")?.requestSubmit();
     await vi.waitFor(() => expect(writeLayer).toHaveBeenCalled());
     await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
+  });
+
+  describe("bindProfileEnrich", () => {
+    const mockEnrich = vi.mocked(enrichLinkedPagesFromVault);
+
+    beforeEach(() => {
+      mockEnrich.mockReset();
+      vi.spyOn(window, "confirm").mockReturnValue(true);
+      vi.spyOn(window, "alert").mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("skips when button missing", () => {
+      const root = document.createElement("div");
+      bindProfileEnrich(root, {} as never, vi.fn());
+      expect(mockEnrich).not.toHaveBeenCalled();
+    });
+
+    it("enriches linked pages on confirm", async () => {
+      mockEnrich.mockResolvedValue({ attempted: 2, enriched: 1, skipped: 0, errors: [] });
+      const root = document.createElement("div");
+      root.innerHTML = `<button data-profile-enrich-links></button>`;
+      const onDone = vi.fn();
+      bindProfileEnrich(root, {} as never, onDone);
+      root.querySelector<HTMLButtonElement>("[data-profile-enrich-links]")?.click();
+      await vi.waitFor(() => expect(mockEnrich).toHaveBeenCalledWith({}, { force: true }));
+      await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
+      expect(window.alert).toHaveBeenCalled();
+    });
+
+    it("does nothing when user cancels confirm", () => {
+      vi.spyOn(window, "confirm").mockReturnValue(false);
+      const root = document.createElement("div");
+      root.innerHTML = `<button data-profile-enrich-links></button>`;
+      bindProfileEnrich(root, {} as never, vi.fn());
+      root.querySelector<HTMLButtonElement>("[data-profile-enrich-links]")?.click();
+      expect(mockEnrich).not.toHaveBeenCalled();
+    });
   });
 });
