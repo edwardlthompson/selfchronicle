@@ -15,6 +15,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0](https://github.com/edwardlthompson/selfchronicle/compare/v0.15.1...v0.16.0) (2026-07-26)
+
+
+### Added
+
+* **web:** compact bio chips, IMDb enrich, occupations label ([78f0632](https://github.com/edwardlthompson/selfchronicle/commit/78f0632557d7d07197ecc5e1b6258b7fcee83e7e))
+
+
+### Fixed
+
+* **ci:** gate android jobs via path-changes outputs ([da33120](https://github.com/edwardlthompson/selfchronicle/commit/da33120b0408b1357b43e3f926cbcbe8b24f712f))
+* **ci:** skip pruned android jobs; update welcome e2e smoke ([b60048f](https://github.com/edwardlthompson/selfchronicle/commit/b60048f01c4a0cf829af99d207322117c0760200))
+* **ci:** wrap hashFiles job conditions in expressions ([168a379](https://github.com/edwardlthompson/selfchronicle/commit/168a379d5267bde0502a3db94021e0531fa6198f))
+* **security:** bump brace-expansion, js-yaml, postcss overrides ([bea4b1e](https://github.com/edwardlthompson/selfchronicle/commit/bea4b1e3682c50292d60e2df4669dcc0fb1da651))
+
+
+### Changed
+
+* **release:** merge origin/main for v0.1.0 release ([6cba5b0](https://github.com/edwardlthompson/selfchronicle/commit/6cba5b0b1904af2c9a510c7e0954ecffb0339ecc))
+* **release:** prepare v0.1.0 release ([72f14fa](https://github.com/edwardlthompson/selfchronicle/commit/72f14fae7ededcc5fb2ee35382657365560584f5))
+
 ## [0.15.1](https://github.com/edwardlthompson/agent-project-bootstrap/compare/v0.15.0...v0.15.1) (2026-07-22)
 
 
