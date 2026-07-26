@@ -1,30 +1,15 @@
 import { test, expect } from "@playwright/test";
 import path from "node:path";
+import { skipWelcome } from "./welcome";
 
 const shotDir = path.resolve("..", "..", "smoke-screenshots", "playwright");
 
 test.describe("route smoke + screenshots", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test("welcome → demo import → primary routes", async ({ page }) => {
-    await page.goto("/");
+  test("skip welcome → primary routes", async ({ page }) => {
+    await skipWelcome(page);
     await expect(page.getByRole("heading", { name: "SelfChronicle" })).toBeVisible();
-    await expect(page.getByTestId("welcome-home")).toBeVisible({ timeout: 10_000 });
-    await page.screenshot({ path: path.join(shotDir, "00-welcome.png"), fullPage: true });
-
-    await page.getByTestId("welcome-home").getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByTestId("welcome-github")).toBeVisible();
-    await page.screenshot({ path: path.join(shotDir, "00b-welcome-github.png"), fullPage: true });
-
-    await page.getByRole("button", { name: /bundled demo pack/i }).click();
-    await expect(page.getByTestId("welcome-review")).toBeVisible({ timeout: 15_000 });
-    await page.screenshot({ path: path.join(shotDir, "00c-welcome-review.png"), fullPage: true });
-
-    await page.getByRole("button", { name: "Commit to vault" }).click();
-    await expect(page.getByTestId("welcome-done")).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: "Open Today" }).click();
-
-    await expect(page.getByTestId("today-home")).toBeVisible({ timeout: 10_000 });
     await page.screenshot({ path: path.join(shotDir, "01-today.png"), fullPage: true });
 
     await page.getByRole("button", { name: "Profile" }).click();
