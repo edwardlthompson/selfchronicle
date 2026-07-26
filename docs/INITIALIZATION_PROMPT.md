@@ -4,9 +4,9 @@ You are a Senior Software Architect and Expert AI Coding Agent. Follow this temp
 
 ## 1. Project Dimensions
 
-**Platform/Tech Stack:** [INSERT PLATFORM / TECH STACK HERE]
+**Platform/Tech Stack:** multi
 
-**Purpose & Goals:** [INSERT DETAILED APP DESCRIPTION AND GOALS HERE]
+**Purpose & Goals:** Privacy-first, local-first personal memory and living biography system that aggregates user-owned exports into an injectable profile
 
 **Stakeholders:** Primary users, operators, and maintainers. Define **non-goals** (explicit scope boundaries) and **success metrics** alongside goals.
 
@@ -60,7 +60,6 @@ Initialize the repository with a professional, hermetic layout. Early in the lif
 - **`[AGENT]`** Every file in `scripts/validate-bootstrap.sh` REQUIRED list must be indexed (including `CONTRIBUTING.md`, `LICENSE`, `.env.example`, and security playbooks).
 - **`[AUTO]`** `validate-template-index.sh` must pass before Sprint 0 sign-off.
 
-
 **CI implementation discipline (prevent false greens):**
 
 - **`[AGENT]`** FOSS compliance grep in CI must scan **build manifests only** (`*.gradle`, `*.gradle.kts`, `*.toml`) — never README or docs that mention prohibited SDK names in compliance bullets.
@@ -92,7 +91,6 @@ Every task in `BUILD_PLAN.md` must carry an owner label so automated and human w
 | `HUMAN` | Human developer | Approvals, credentials, GitHub settings, product decisions |
 | `ADB` | Human (Android) | Android SDK, emulator/device testing, F-Droid submission |
 | `AUTO` | CI/scripts/bots | GitHub Actions, Dependabot, pre-commit, update checker |
-
 - **Status markers:** 🔲 open · ✅ done · ❌ blocked — use emoji on all checklists (not `- [ ]` checkboxes) for readable source and Preview
 - **Task format:** `🔲 [OWNER] Description` (done: swap 🔲 → ✅; blocked: swap 🔲 → ❌ and note reason)
 - **Sprint structure:** every sprint has two subsections:
@@ -122,6 +120,7 @@ Every task in `BUILD_PLAN.md` must carry an owner label so automated and human w
 |------|-------|----------------|
 | Web PWA tests | AGENT | `src/web/**` |
 | Python CLI suite | AGENT | `src/python/**` |
+
 ```
 
 ## 4. Target-Specific Ecosystem Modules (Activate Applicable Module)
@@ -230,6 +229,7 @@ Before claiming any sprint complete or requesting `[HUMAN]` approval:
 [AUTO] scripts/check-license-compliance.sh (after deps installed)
 [AUTO] pre-commit run --all-files
 [AUTO] CI-equivalent local run (stack test commands from examples/)
+
 ```
 
 **Stack-specific CI-equivalent commands (run before claiming Sprint 0 done):**
@@ -240,11 +240,11 @@ Before claiming any sprint complete or requesting `[HUMAN]` approval:
 | Python | `uv sync --locked --all-extras` → `uv run ruff check .` → `uv run ruff format --check .` → `uv run mypy src` → `uv run pytest` |
 | Android | Gradle structure + FOSS manifest grep (not README) per `examples/android/` CI pattern |
 | Node | `npm ci` → `npm run lint` → `npm test` in `examples/node/` |
-
 **Post-push GitHub gate (after first push to `main`):**
 
 ```text
 [AUTO] scripts/check-github-ci.sh --wait 300
+
 ```
 
 Polls **CI**, **Security Scan**, and **CodeQL** on the pushed commit. A green CI job alone does not satisfy Sprint 0 — Security Scan failures (e.g. invalid `trivy-action` version pins) must be fixed before sign-off.
@@ -275,6 +275,7 @@ scripts/init-project.sh \
   --purpose "Offline-first notes" \
   --interval weekly \
   --codeowner myuser
+
 ```
 
 PowerShell: `pwsh scripts/init-project.ps1 -NonInteractive -Stack web -ProjectName "My App" -ProjectPurpose "Offline-first notes"`. Add `-Prune` to remove unused stacks; `-KeepOptional` (default) retains rust/go/lightroom, `-PruneOptional` removes them too. See `scripts/init-project.sh --help`.

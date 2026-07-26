@@ -1,11 +1,9 @@
-import { APP_VERSION } from "./about/aboutSession";
 import type { DonationConfig } from "./about/types";
-import { createAboutPanel } from "./components/AboutPanel";
-import { createSettingsPanel } from "./components/SettingsPanel";
 import { createThemeToggle } from "./components/ThemeToggle";
-import { isOnline } from "./greet";
 import { t } from "./i18n";
-import { bindPanelDialog } from "./panelDialog";
+import { SHELL_ROUTES, type ShellRoute } from "./shell/nav";
+import { mountSettingsOrAbout, renderVaultPanelHtml } from "./shell/panelMount";
+import { renderTodayView, type TodayViewModel } from "./shell/TodayView";
 
 let dialogCleanup: (() => void) | undefined;
 
@@ -14,6 +12,14 @@ export type AppShellState = {
   showSettings: boolean;
   updateStatus: string;
   donations: DonationConfig;
+  route: ShellRoute;
+  today: TodayViewModel;
+  profileHtml?: string;
+  learnHtml?: string;
+  handoffHtml?: string;
+  welcomeHtml?: string;
+  searchQuery?: string;
+  focusBannerHtml?: string;
 };
 
 export type AppShellCallbacks = {
@@ -21,6 +27,8 @@ export type AppShellCallbacks = {
   onUpdateCheckChange?: (enabled: boolean) => void;
   onApplyUpdate?: () => void;
   canApplyUpdate?: boolean;
+  onSaveNote?: (text: string) => void;
+  onNavigate?: (route: ShellRoute) => void;
 };
 
 export function createAppShell(
@@ -28,10 +36,37 @@ export function createAppShell(
   state: AppShellState,
   callbacks: AppShellCallbacks,
 ): void {
-  const online = isOnline();
-  const statusKey = online ? "app.status.online" : "app.status.offline";
   const currentUpdateLabel = t("about.update.current");
   const showHomeUpdate = state.updateStatus !== currentUpdateLabel;
+  const nav = SHELL_ROUTES.map(
+    (r) =>
+      `<button type="button" class="sc-nav-btn${state.route === r.id ? " is-active" : ""}" data-nav="${r.id}" aria-current="${state.route === r.id ? "page" : "false"}">${t(r.labelKey)}</button>`,
+  ).join("");
+
+  const onWelcome = state.route === "welcome";
+  let mainBody = "";
+  if (onWelcome) {
+    mainBody =
+      state.welcomeHtml ??
+      `<section data-testid="welcome-home"><p class="gp-body">${t("welcome.title")}</p></section>`;
+  } else if (state.route === "today") mainBody = renderTodayView(state.today);
+  else if (state.route === "profile") {
+    mainBody =
+      state.profileHtml ??
+      `<section data-testid="profile-stub"><p class="gp-body">${t("profile.stub")}</p></section>`;
+  } else if (state.route === "learn") {
+    mainBody =
+      state.learnHtml ??
+      `<section data-testid="learn-stub"><p class="gp-body">${t("learn.intro")}</p></section>`;
+  } else if (state.route === "vault") {
+    mainBody = renderVaultPanelHtml(state.today.vault);
+  } else if (state.route === "handoff") {
+    mainBody =
+      state.handoffHtml ??
+      `<section data-testid="handoff-stub"><p class="gp-body">${t("handoff.intro")}</p></section>`;
+  } else {
+    mainBody = `<section class="sc-trust" data-testid="trust-panel"><h2>${t("trust.privacy_title")}</h2><p class="gp-body">${t("trust.privacy_body")}</p><p class="gp-body">${t("first_run.body")}</p><div data-dc-settings-mount></div></section>`;
+  }
 
   root.innerHTML = `
     <main>
@@ -42,61 +77,58 @@ export function createAppShell(
           <button type="button" class="gp-about-btn" data-about-open aria-label="${t("about.open")}">i</button>
         </div>
       </div>
-      <p class="gp-headline">${t("app.greeting")}</p>
-      <p class="gp-body" data-testid="status">${t(statusKey)}</p>
+      ${onWelcome ? "" : `<nav class="sc-nav" aria-label="Primary">${nav}</nav>`}
+      ${onWelcome ? "" : (state.focusBannerHtml ?? "")}
       ${
-        showHomeUpdate
+        !onWelcome && showHomeUpdate
           ? `<p class="gp-update-banner" data-testid="home-update-status" aria-live="polite">${state.updateStatus}</p>`
           : ""
       }
+      <div data-route-mount>${mainBody}</div>
       <div data-panel-mount></div>
     </main>
   `;
 
   const actions = root.querySelector<HTMLDivElement>(".gp-header-actions");
-  if (actions) {
-    actions.insertBefore(createThemeToggle(), actions.firstChild);
-  }
+  if (actions) actions.insertBefore(createThemeToggle(), actions.firstChild);
 
+  root.querySelectorAll("[data-nav]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const id = (el as HTMLElement).dataset.nav as ShellRoute;
+      callbacks.onNavigate?.(id);
+      callbacks.onState({ route: id, showAbout: false, showSettings: false });
+    });
+  });
   root.querySelector("[data-about-open]")?.addEventListener("click", () => {
     callbacks.onState({ showAbout: !state.showAbout, showSettings: false });
   });
-
   root.querySelector("[data-settings-open]")?.addEventListener("click", () => {
-    callbacks.onState({ showSettings: !state.showSettings, showAbout: false });
+    // Gear opens the Settings route (privacy / Day Close / Focus / MCP).
+    // Theme + updates stay in the floating panel (toggle when already on Settings).
+    const onSettings = state.route === "settings";
+    callbacks.onState({
+      showSettings: onSettings ? !state.showSettings : false,
+      showAbout: false,
+      route: "settings",
+    });
+  });
+  root.querySelector("[data-testid=note-save]")?.addEventListener("click", () => {
+    const area = root.querySelector<HTMLTextAreaElement>("[data-testid=note-draft]");
+    callbacks.onSaveNote?.(area?.value ?? "");
   });
 
   const mount = root.querySelector("[data-panel-mount]");
   if (!mount) return;
-
   dialogCleanup?.();
-  dialogCleanup = undefined;
-  mount.innerHTML = "";
-
-  if (state.showSettings) {
-    const panel = createSettingsPanel({
-      onClose: () => callbacks.onState({ showSettings: false }),
-      onUpdateCheckChange: callbacks.onUpdateCheckChange,
-    });
-    mount.appendChild(panel);
-    dialogCleanup = bindPanelDialog(panel, () => callbacks.onState({ showSettings: false }));
-    return;
-  }
-
-  if (!state.showAbout) return;
-
-  mount.appendChild(
-    createAboutPanel(
-      {
-        version: APP_VERSION,
-        updateStatus: state.updateStatus,
-        donations: state.donations,
-        canApplyUpdate: callbacks.canApplyUpdate,
-      },
-      () => callbacks.onState({ showAbout: false }),
-      callbacks.onApplyUpdate,
-    ),
-  );
-  const aboutPanel = mount.lastElementChild as HTMLElement;
-  dialogCleanup = bindPanelDialog(aboutPanel, () => callbacks.onState({ showAbout: false }));
+  dialogCleanup = mountSettingsOrAbout(mount, {
+    showSettings: state.showSettings,
+    showAbout: state.showAbout,
+    updateStatus: state.updateStatus,
+    donations: state.donations,
+    canApplyUpdate: callbacks.canApplyUpdate,
+    onCloseSettings: () => callbacks.onState({ showSettings: false }),
+    onCloseAbout: () => callbacks.onState({ showAbout: false }),
+    onUpdateCheckChange: callbacks.onUpdateCheckChange,
+    onApplyUpdate: callbacks.onApplyUpdate,
+  });
 }

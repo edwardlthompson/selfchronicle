@@ -1,21 +1,30 @@
-# Golden Path Node (Hono API)
+# SelfChronicle MCP host (Node)
 
-Minimal typed HTTP API using Hono, TypeScript strict mode, and Vitest.
+Local Node (Hono) host for MCP / CLI tools that read and write the vault **with user permission**.
 
-## Commands
+## Scripts
 
 ```bash
 npm ci
-npm run lint
-npm test
 npm run dev
+npm test
+
 ```
 
-## Routes
+## Role
 
-- `GET /health` — readiness probe
-- `GET /greet/:name?` — sample JSON handler
+- Local MCP-style tool host (`docs/features/mcp-host.md`, `docs/MCP_HANDOFF.md`)
+- CLI mirror (`selfchronicle`) planned in Sprint 11
 
-## CI Integration
+Package name: `selfchronicle-mcp`.
 
-Runs in the root `.github/workflows/ci.yml` `node` job.
+## MCP HTTP API
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/mcp/tools` | List tool names |
+| POST | `/mcp/session` | Grant `{ client, scopes }` → token |
+| DELETE | `/mcp/session` | Revoke `Authorization: Bearer <token>` |
+| POST | `/mcp/tools/:name` | Invoke tool with bearer token |
+| GET | `/mcp/activity` | Activity log |
+Scopes: `read`, `write-evidence`. `propose_fact` requires `{ confirm: true }`.

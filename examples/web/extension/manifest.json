@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "SelfChronicle Share",
+  "version": "0.1.0",
+  "description": "User-initiated share of selected text into SelfChronicle Evidence staging.",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_title": "Send selection to SelfChronicle"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

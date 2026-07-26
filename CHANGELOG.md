@@ -55,25 +55,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-* **security:** resolve Dependabot High/Moderate npm alerts — merge `@hono/node-server` 2.0.10; override `js-yaml` ≥4.3.0 and `brace-expansion` ≥1.1.16 in `examples/web`
+## [0.1.0] - 2026-07-26
 
 ### Added
 
-* **cursor:** worktrees.json, Auto-review permissions, 7 skills, FOSS plugin pack, CLI workflow example (M33)
-* **cursor:** local-compute rule — prefer This Computer parallel Task/worktrees/`/best-of-n` over Cloud
-* **gates:** multi-core `validate-bootstrap` via `run_checks_parallel.py` (`BOOTSTRAP_CHECK_JOBS`)
-* **python:** pytest-xdist `-n auto` for local CPU parallelism
+* **SelfChronicle PWA** — local vault (Evidence, Facts, Biography), Welcome import hub, Profile surfaces, Day Close, Handoff export, optional Google Drive sync, Capacitor Android debug wrapper
+* **Import pipeline** — ChatGPT/Claude/Grok paste, Drive pack, public GitHub metadata, manual paste, and catalog adapters (Gemini, Gmail, WhatsApp, Meta, Discord, Slack, …)
+* **Node MCP host** — Hono server with vault tool wrappers (`examples/node/`)
+* **Product docs** — architecture, data model, UX flows, screen inventory, feature specs, security/privacy design
+* **Sprints 0–13 + M34 audit** — P0–P2 vertical slices archived in `COMPLETED_TASKS.md`
 
 ### Fixed
 
-* **web:** Vitest jsdom `localStorage` on Node 25+ (KB-011 setup polyfill)
+* **security:** npm overrides for `js-yaml` ≥5.2.2, `postcss` ≥8.5.23, `brace-expansion` ≥1.1.16; BlueOak-1.0.0 license allowlist
+* **gates:** about-feature-gate for SelfChronicle shell; BUILD_PLAN parallel exception for M34 HUMAN/ADB follow-ups
+* **web:** Vitest jsdom `localStorage` on Node 25+; bio/occupation module file splits; test mocks
 
 ### Changed
 
-* **android:** feature-gate runs Gradle tests with `--parallel`
-* **commercial:** Automations recipes, Bugbot Autofix map, cloud conversation hooks example
+* **stack:** pruned to web+node; product renamed from bootstrap template to SelfChronicle
+* **license:** MIT (BlueOak-1.0.0 permitted for npm transitive deps)
 
 ## [0.14.1](https://github.com/edwardlthompson/agent-project-bootstrap/compare/v0.14.0...v0.14.1) (2026-07-12)
 

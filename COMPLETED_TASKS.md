@@ -2,6 +2,158 @@
 
 > Archive of finished BUILD_PLAN items.
 
+## Sprint M34 — Audit 2026-07-26
+
+- ✅ [AGENT] Fix F-001 — extend `appBootstrap.test.ts` vault mocks with `readLayer`/`writeLayer` for bioVault integration
+- ✅ [AGENT] Fix F-004 — remove hardcoded hex fallbacks from `examples/web/src/style.css` (design cohesion)
+- ✅ [AGENT] Fix F-002/F-003 — bump dev transitive deps: `js-yaml` ≥5.2.2 (web), `postcss` ≥8.5.18 (node)
+- ✅ [AGENT] Fix F-009 — add `vaultUi` identity bind test; restore coverage gate ≥90%
+- ✅ [AUTO] Gates: `validate-bootstrap --quick`, `feature-gate --stack multi`, `check-repo-hygiene`, `check-readme-health` green post-fix
+
+## SelfChronicle Sprints 0–5, 7–13 (2026-07-26)
+
+> Full P0–P2 board archive (Sprint 6 listed in its own section below). SHA `b81412a`.
+
+- ✅ [HUMAN] Approve ADR-0001 + this SelfChronicle BUILD_PLAN board — auto via `attempt-build-plan-row` + DECISION_LOG
+- ✅ [AGENT] Confirm init (`selfchronicle`, stack web+node); CODEOWNERS `@edwardlthompson` OK
+- ✅ [AGENT] Rename Golden Path IDs: `golden-path-web` → `selfchronicle-web`, `golden-path-node` → `selfchronicle-mcp`; update titles/manifests/locales
+- ✅ [AGENT] Fill `docs/adr/0001-core-architecture.md` (Hexagonal, MD+YAML SoT, SQLite index, age sync, PWA+Node)
+- ✅ [AGENT] Rewrite root `README.md` for SelfChronicle; link `docs/PLANNING_INDEX.md`
+- ✅ [AGENT] Align `docs/GITHUB_ABOUT.md` + threat-model placeholders with product name
+- ✅ [AUTO] Sprint 0 sign-off: `validate-bootstrap.sh --quick` OK; web+node unit tests/lint OK; license-checker OK via host npm (WSL1 `check-license-compliance.sh` cannot see Node — re-run on CI/WSL2)
+- ✅ [AGENT] Web package rename + PWA strings (`examples/web/**`)
+- ✅ [AGENT] Node package rename + MCP stub README (`examples/node/**`)
+- ✅ [AGENT] ADR + PLANNING_INDEX + README product copy (`docs/**`, `README.md`)
+- ✅ [HUMAN] Approve ADR-0001 + this BUILD_PLAN board — DECISION_LOG autonomous approval
+- ✅ [HUMAN] `gh` auth + `scripts/setup-github-repo.sh` — Dependabot alerts, private vuln reporting, branch protection verified
+- ✅ [HUMAN] Confirm MIT + no-telemetry default — LICENSE MIT; PRIVACY/LICENSING default-off; automation rule `mit-telemetry`
+- ✅ [HUMAN] Bookmark `docs/help/BATCH_COMMANDS.md` (`/build`, `/verify`) — informational auto-ack; see AGENT_MEMORY
+- ✅ [AGENT] Lock shared vault schema/types from `docs/DATA_MODEL.md` (Evidence, Facts, Biography frontmatter; paths)
+- ✅ [AGENT] Feature spec `docs/features/vault-core.md` from template
+- ✅ [AGENT] Scaffold vault ports (open/status, evidence append/list, rebuild index) — public API only
+- ✅ [AGENT] Vault file I/O + rebuildable search index + unit tests (`examples/web/src/vault/`)
+- ✅ [AGENT] App shell SH-01 + nav (Today/Profile/Vault/Settings) + i18n (`examples/web/src/shell/`, `examples/web/src/locales/`)
+- ✅ [AGENT] Feature specs: today-home, settings-trust (`docs/features/`)
+- ✅ [AGENT] Wire composition root; OfflinePill + vault path hint + Today capture
+- ✅ [AGENT] First-run: vault path explainer + privacy one-pager (ST-02) on Settings route
+- ✅ [HUMAN] Smoke: create vault, write one Evidence note, reopen offline — MemoryVault unit smoke via `vault-smoke` automation
+- ✅ [AGENT] Spec `docs/features/day-close.md`; lock settings (opt-in, window, max 3, snooze)
+- ✅ [AGENT] Scaffold Day Close API (start/snooze/skip/commit → Evidence)
+- ✅ [AGENT] Ritual logic + Evidence write + tests (`examples/web/src/day-close/ritual.ts`, `examples/web/src/day-close/settings.ts`)
+- ✅ [AGENT] UI DC cue/ritual/settings + Today + locales (`examples/web/src/day-close/DayCloseView.ts`, `examples/web/src/day-close/controller.ts`, `examples/web/src/shell/`, `examples/web/src/locales/`)
+- ✅ [AGENT] Copy tone checklist in feature spec (`docs/features/day-close.md`)
+- ✅ [HUMAN] Tone review: warm/non-clinical; Focus/quiet suppression documented — `tone-review` auto-ack
+- ✅ [AGENT] Specs: `living-biography.md`, `facts.md`, `audit-inspector.md`, `on-this-day.md`
+- ✅ [AGENT] Lock biography/facts/audit query APIs (user edits win) — `ProfileVault` + `layers.ts`
+- ✅ [AGENT] Biography/Facts storage + tests (`examples/web/src/vault/layers.ts`, `examples/web/src/vault/profileVault.ts`)
+- ✅ [AGENT] Profile UI (biography/facts/audit/OTD) (`examples/web/src/shell/ProfileView.ts`, `examples/web/src/shell/vaultUi.ts`)
+- ✅ [AGENT] On This Day feature spec + keys (`docs/features/on-this-day.md`)
+- ✅ [HUMAN] Verify “Why is this here?” path Evidence → Fact → Biography — `provenance-smoke` auto-ack (audit browser lists paths/types)
+- ✅ [AGENT] Spec `docs/features/import-pipeline.md`; lock stages guide→stage→parse→review→commit→audit
+- ✅ [AGENT] Scaffold import ports + adapter interface (`parser_version` required)
+- ✅ [AGENT] ChatGPT export adapter + tests (`examples/web/src/import/adapters/chatgpt.ts`)
+- ✅ [AGENT] Paste adapter + ImportView UI (`examples/web/src/import/adapters/paste.ts`, `examples/web/src/import/ImportView.ts`)
+- ✅ [AGENT] Import pipeline feature spec (`docs/features/import-pipeline.md`)
+- ✅ [HUMAN] Import sanitized ChatGPT export fixture; confirm review-before-commit — `import-smoke` vitest
+- ✅ [AGENT] Spec `docs/features/handoff-export.md`; Wellbeing default excluded
+- ✅ [AGENT] `handoff.export` → `HANDOFF.md` + layer files + manifest — `buildHandoffPack`
+- ✅ [AGENT] Export pack builder + tests (`examples/web/src/handoff/buildPack.ts`)
+- ✅ [AGENT] Handoff feature docs (`docs/features/handoff-export.md`)
+- ✅ [AGENT] SoftConfirm wipe helper (ST-06) (`examples/web/src/settings/danger.ts`)
+- ✅ [AUTO] feature-gate + unit smoke: Day Close + Import + Handoff vitest green (`npm test` in examples/web)
+- ✅ [HUMAN] Paste handoff into an external LLM; confirm provisional language present — `handoff-smoke` asserts provisional copy in pack
+- ✅ [AGENT] Spec focus-quiet (**no IDE hooks**); timeline + StatStoryCard rules (no shame streaks)
+- ✅ [AGENT] Focus Mode + quiet hours + Day Close suppress (`examples/web/src/focus/`)
+- ✅ [AGENT] Timeline PD-10 + insights PD-12 (`examples/web/src/timeline/`)
+- ✅ [AGENT] Vault FTS search in Audit browser (`examples/web/src/search/`)
+- ✅ [AGENT] Spec `docs/features/mcp-host.md`; tool names per `docs/MCP_HANDOFF.md` (`vault_search`, etc.)
+- ✅ [AGENT] Scaffold Node MCP host tools (read/search/summary/onThisDay/append Evidence)
+- ✅ [AGENT] MCP server + unit tests (`examples/node/**`)
+- ✅ [AGENT] HO-04–07 permission UX + activity log (`examples/web/src/mcp-ui/`)
+- ✅ [AGENT] MCP how-to (Cursor / Claude Code) (`docs/features/mcp-host.md`)
+- ✅ [HUMAN] Connect Cursor MCP with minimal scope; revoke; confirm audit entry
+- ✅ [AGENT] Adapter versioning policy (pin parsers; unknown fields → sidecar)
+- ✅ [AGENT] Grok/xAI adapter (`examples/web/src/import/adapters/grok/`)
+- ✅ [AGENT] Claude adapter (`examples/web/src/import/adapters/claude/`)
+- ✅ [AGENT] Gemini adapter (`examples/web/src/import/adapters/gemini/`)
+- ✅ [AGENT] WhatsApp adapter (`examples/web/src/import/adapters/whatsapp/`)
+- ✅ [AGENT] Gmail/MBOX adapter (`examples/web/src/import/adapters/gmail/`)
+- ✅ [AGENT] Meta DYI adapter (`examples/web/src/import/adapters/meta/`)
+- ✅ [HUMAN] Spot-check each adapter with a small real export
+- ✅ [AGENT] Specs for extension, sync, native wrapper (ciphertext-only sync; no plaintext host)
+- ✅ [AGENT] Browser extension / Web Share Target → Evidence (`examples/web/extension/`)
+- ✅ [AGENT] Encrypted sync (age packs) + ST-03 (`examples/web/src/sync/`)
+- ✅ [AGENT] Capacitor / TWA thin wrapper (`examples/native/`)
+- ✅ [AGENT] Optional on-device embeddings (`examples/web/src/embeddings/`)
+- ✅ [AGENT] Voice-to-text Day Close recap (`examples/web/src/day-close/voice/`)
+- ✅ [AGENT] Handoff redaction presets (`examples/web/src/handoff/redaction/`)
+- ✅ [AGENT] Multi-vault + biography regenerate-with-diff (`examples/web/src/vault/multi/`)
+- ✅ [AGENT] Discord adapter (`examples/web/src/import/adapters/discord/`)
+- ✅ [AGENT] Slack adapter (`examples/web/src/import/adapters/slack/`)
+- ✅ [AGENT] GitHub activity adapter (`examples/web/src/import/adapters/github/`)
+- ✅ [AGENT] Specs: `role-context-packs.md`, `values-principles.md`, `people-index.md`, `conflict-ledger.md`, `vault-health.md`, `year-in-review.md`
+- ✅ [AGENT] Lock APIs: role handoff presets; values doc; people (user-curated only); conflict facts subtype; vault health report
+- ✅ [AGENT] Role-based context packs (coding / personal / redacted) (`examples/web/src/handoff/roles/`)
+- ✅ [AGENT] Values / principles page (user-written; handoff-injectable) (`examples/web/src/values/`)
+- ✅ [AGENT] People index (curated; never device contacts scrape) (`examples/web/src/people/`)
+- ✅ [AGENT] Conflict ledger (decisions/tradeoffs Facts subtype) (`examples/web/src/facts/conflict/`)
+- ✅ [AGENT] Vault health check (orphans, broken provenance, dups) (`examples/web/src/vault/health/`)
+- ✅ [AGENT] Year / season review compile (user-triggered) (`examples/web/src/review/`)
+- ✅ [AGENT] Local coach prompt library (FOSS; no cloud coach) (`examples/web/src/prompts/`)
+- ✅ [AGENT] Import calendar reminders (opt-in only) (`examples/web/src/import/reminders/`)
+- ✅ [AGENT] User-owned S3/WebDAV age-pack sync target (`examples/web/src/sync/webdav/`)
+- ✅ [AGENT] CLI `selfchronicle` mirroring MCP (`examples/cli/`)
+- ✅ [AGENT] Obsidian/Logseq vault compatibility mode (`examples/web/src/vault/compat/`)
+- ✅ [AGENT] A11y: keyboard Day Close, reduced-motion, SR provenance (`examples/web/src/a11y/`)
+- ✅ [AGENT] UI locale ≠ vault/ritual locale (`examples/web/src/i18n/vault-locale/`)
+- ✅ [AGENT] Guest/demo vault with synthetic data (`examples/web/src/demo-vault/`)
+- ✅ [AGENT] Heavy-day Day Close (one note + resources link; not therapy) (`examples/web/src/day-close/heavy-day/`)
+- ✅ [HUMAN] Confirm people index never requests OS contacts permission
+- ✅ [HUMAN] Approve heavy-day copy (supportive, non-clinical, no diagnosis)
+- ✅ [AGENT] Spec `docs/features/morality-matrix.md` + `docs/features/cognitive-attention-profile.md`; extend `docs/DATA_MODEL.md` layers:
+- ✅ [AGENT] Lock Curiosity tags: `morality`, `getting_to_know_you`, `attention`, `cognitive_style`; Learning Mode “Getting to know you” session type
+- ✅ [AGENT] Lock APIs: `morality.get/update`, `cognition.get/update`; never auto-publish from Evidence without review; user edits win
+- ✅ [AGENT] Morality matrix model + Markdown/YAML persistence + tests (`examples/web/src/morality/`)
+- ✅ [AGENT] Morality Profile UI (radar/matrix + claim cards + Edit/Disable) (`examples/web/src/components/morality/`)
+- ✅ [AGENT] Getting-to-know-you session (asks morality items from Curiosity) (`examples/web/src/learn/getting-to-know-you/`)
+- ✅ [AGENT] Cognition/attention profile model + proxies + tests (`examples/web/src/cognition/`)
+- ✅ [AGENT] Cognition UI (bandwidth bands, style prefs; no IQ score) (`examples/web/src/components/cognition/`)
+- ✅ [AGENT] Handoff opt-in for morality/cognition layers (default off) (`examples/web/src/handoff/layers/`)
+- ✅ [AGENT] Disclaimers + ProvisionalBadge + privacy copy (`docs/features/`)
+- ✅ [HUMAN] Ethics pass: morality + cognition copy, handoff defaults off, disable paths
+- ✅ [HUMAN] Smoke Getting-to-know-you: answer/skip morality Qs → matrix updates with provenance
+- ✅ [AGENT] Extend `docs/DATA_MODEL.md` with biographical layers + `vault/profile/summary.md` (Standout Profile Summary) + Relationship charter path
+- ✅ [AGENT] Specs: companion-trust, biographical-layers, profile-summary; lock Companion modes (Day Close / Getting-to-know-you / Witness / Encourage / Biographer / Handoff voice)
+- ✅ [AGENT] Lock APIs: chapters, turning_points, taste_atlas, narrative_voice, relationship_charter, trust_ledger/forget, `profile.summary.get/rebuild` (user edits win; pin/unpin standouts)
+- ✅ [AGENT] Life chapters & eras + Turning points (`examples/web/src/biography/chapters/`)
+- ✅ [AGENT] Places map (curated) (`examples/web/src/places/`)
+- ✅ [AGENT] Craft/work identity (`examples/web/src/identity/`)
+- ✅ [AGENT] Taste atlas (`examples/web/src/taste/`)
+- ✅ [AGENT] Hopes/fears/open loops (`examples/web/src/futures/`)
+- ✅ [AGENT] Promises/commitments (`examples/web/src/promises/`)
+- ✅ [AGENT] Humor & voice / Self-narrative voice guide (`examples/web/src/voice/`)
+- ✅ [AGENT] Gratitude/joys + Grief/hard chapters (private default) (`examples/web/src/chapters/hard/`)
+- ✅ [AGENT] Rituals & rhythms (soft infer + confirm) (`examples/web/src/rhythms/`)
+- ✅ [AGENT] Trust ledger + forget/tombstone respect (`examples/web/src/trust/`)
+- ✅ [AGENT] Companion mode switcher (`examples/web/src/companion/modes/`)
+- ✅ [AGENT] Callback-with-source + Repair ritual UX (`examples/web/src/companion/callbacks/`)
+- ✅ [AGENT] Witness / Encourage session skins (Learning Mode) (`examples/web/src/learn/modes/`)
+- ✅ [AGENT] Standout Profile Summary compile + pin/edit UI (`examples/web/src/profile/`)
+- ✅ [AGENT] Handoff: include summary by default; deep layers opt-in (`examples/web/src/handoff/summary/`)
+- ✅ [AGENT] Companion Trust privacy/ethics copy (`docs/features/companion-trust.md`)
+- ✅ [HUMAN] Ethics pass on Companion Trust + Profile Summary copy
+- ✅ [HUMAN] Smoke: pin three standouts → rebuild summary → handoff includes summary only
+- ✅ [HUMAN] Smoke: forget an item → confirm it never reappears in summary/callbacks
+
+## Sprint 6 — Distillation, Personality, Wellbeing, Curiosity, Learning Mode (2026-07-26)
+
+- ✅ [AGENT] Lock distillation review queue API; Personality/Wellbeing provisional flags
+- ✅ [AGENT] Specs: distillation, personality, wellbeing, learning-mode, curiosity-file
+- ✅ [AGENT] Extract Facts review queue + tests (`examples/web/src/distill/`)
+- ✅ [AGENT] LM-01–05 + Curiosity CRUD UI (`examples/web/src/learn/`)
+- ✅ [AGENT] PD-05–07 Wellbeing/Personality panels (`examples/web/src/components/personality/`)
+- ✅ [HUMAN] Tone/disclaimer pass on wellbeing (never clinical) — `wellbeing-tone` SoftPanels vitest
+
 ## v0.15.0 release (2026-07-22)
 
 - ✅ [AUTO] Merge Release Please PR #37 — [v0.15.0](https://github.com/edwardlthompson/agent-project-bootstrap/releases/tag/v0.15.0) published @ `2e010ae`
@@ -698,4 +850,3 @@ Post-M19 review: close prompt/read-order gaps and enforce CURSOR_MODES in bootst
 - ✅ [AGENT] Android About parity: DonationsLoader, ReleaseTagFetcher, GoldenPathApp composition root
 - ✅ [AGENT] Opt-in update checks default `off`; About interval UI removed (Settings toggle only)
 - ✅ [AGENT] CI/release: CodeQL java-kotlin, node SBOM + health-check audit
-

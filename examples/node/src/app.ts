@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { greet } from "./greet.js";
+import { mountMcp } from "./mcp/routes.js";
 
 export function createApp() {
   const app = new Hono();
@@ -12,5 +13,6 @@ export function createApp() {
     return c.json({ message: greet(name) });
   });
 
+  mountMcp(app);
   return app;
 }

@@ -1,391 +1,138 @@
-# agent-project-bootstrap
+# SelfChronicle
 
-![MIT](https://img.shields.io/badge/license-MIT-2ea043?style=flat-square)
-![Template](https://img.shields.io/badge/template-0.15.1-0969da?style=flat-square)
-![FOSS](https://img.shields.io/badge/FOSS-no_tracking-656d76?style=flat-square)
+**Privacy-first, local-first personal memory and living biography.**
 
-GitHub Template Repository for bootstrapping FOSS projects with Cursor agents.
+SelfChronicle turns user-initiated exports and notes into a vault you own—then surfaces a Living Biography, key facts, and an auditable timeline you can edit and selectively inject into any LLM.
 
-**Bootstrap a FOSS project with agent-ready scaffolding** — initialization prompts, labeled sprints, CI guardrails, and Golden Path examples.
+FOSS under **MIT**. Primary client: installable **PWA** (`examples/web/`) plus a **Capacitor Android** debug wrapper (`app.selfchronicle.vault`).
 
-You get:
+## What works today
 
-- Labeled BUILD_PLAN sprints (`AGENT` / `HUMAN` / `ADB` / `AUTO`)
-- Golden Path stubs (Web, Python, Android, Lightroom)
-- CI guardrails + configurable template update checker
+| Area | Behavior |
+|------|----------|
+| **First run** | Empty vault → **Welcome** source hub. No personal demo data ships in the app or APK. |
+| **Local vault** | Markdown Evidence + Facts + Biography layers. **IndexedDB** persistence survives restarts; `ProfileVault` auto-flushes after writes. |
+| **Import** | Parse → review → commit into one unified vault. All imports land in the same Evidence store with provenance tags (`import`, adapter name, `provisional`). |
+| **Welcome outlets** | Public GitHub username fetch · personal site URL (**pointer only—no scrape**) · Drive pack JSON · ChatGPT/Claude paste · manual paste · full import catalog (Grok, Gemini takeout, WhatsApp, etc.) |
+| **Profile** | Living Biography, Key Facts, On This Day, Insights, Audit search, Life Timeline |
+| **Google Drive sync** | Optional. Sign in from Settings; pack at `SelfChronicle/vault-pack.json`; merge is union-by-path, newer `updated_at` wins. Requires `VITE_GOOGLE_CLIENT_ID` (see below). |
+| **Android** | Debug APK via Capacitor after `npm run build` — see [Android debug build](#android-debug-build). |
+### Import sources (summary)
 
-## Contents
+- **Public GitHub** — fetches public profile/repos for a username you enter.
+- **Personal site URL** — stores the URL you provide as provisional Evidence; **does not fetch page content**.
+- **Drive pack** — paste or upload `vault-pack.json` (same shape as Drive sync).
+- **ChatGPT / Claude** — paste official export JSON.
+- **Grok / xAI** — paste JSON from an export you **unzip first** (`grok_json_v2`; e.g. pick `prod-grok-backend.json` or a smaller pack). No in-app ZIP import.
+- **Manual paste** — any text; review before commit.
+- **Import screen** — additional adapters (Gemini takeout, Gmail, WhatsApp, Meta, Discord, Slack, …) with export how-to links.
 
-- [Quick Start](#quick-start)
-- [Agent shortcuts (cheat sheet)](#agent-shortcuts-cheat-sheet)
-- [Stack Selection](#stack-selection-sprint-0)
-- [What's Included](#whats-included)
-- [BUILD_PLAN Labels](#build_plan-labels)
-- [GitHub Pages Demo](#github-pages-demo)
-- [Template Update Checker](#template-update-checker)
-- [GitHub CI Gate](#github-ci-gate-post-push)
-- [Security](#security)
-- [Supported Stacks](#supported-stacks)
-- [Repository Layout](#repository-layout)
-- [Contributing](#contributing)
-- [GitHub About](#github-about)
-- [Maintainer Release](#maintainer-release)
+## Known limitations
 
----
+Do not expect these yet:
 
-*Getting started*
+- **No silent scraping** of personal sites or chats—exports and explicit paste only.
+- **No default personal seed** in production builds (debug-only `VITE_DEBUG_SEED_IMPORT` / `?debugSeed=adb-reverse` for dev).
+- **Drive sync is cleartext JSON** today—encryption (`age` packs) is planned, not shipped.
+- **Drive does nothing** until you configure a Google OAuth Web client ID.
+- **Grok ZIP** must be unzipped on your machine before import.
 
-## Quick Start
+Roadmap and sprint board: [`BUILD_PLAN.md`](BUILD_PLAN.md).
 
-1. Click **Use this template** on GitHub to create your project repo.
+## Principles
 
-2. Clone and run the init script:
+- Local-first by default (full value offline)
+- FOSS — **MIT**; no proprietary SDKs in the production path
+- You control export, delete, and audit of every item
+- User-initiated import only—official exports, paste, or public GitHub metadata
+- Optional cloud sync must not weaken honesty about what's stored (cleartext Drive pack until crypto lands)
+- Evening **Day Close** ritual is opt-in
+- Soft psychology / wellbeing layers are provisional and editable
+- Companion trust through memory fidelity and honesty—not dark patterns
 
-   ```bash
-   # Linux / macOS / WSL
-   ./scripts/init-project.sh
-
-   # Windows PowerShell
-   .\scripts\init-project.ps1
-   ```
-
-3. Open Cursor and paste the bootstrap prompt from [`docs/START_HERE.md`](docs/START_HERE.md):
-
-   ```
-   Read @docs/START_HERE.md, @docs/CURSOR_MODES.md, and @docs/INITIALIZATION_PROMPT.md.
-   Pick Cursor mode per CURSOR_MODES.md. Follow Section 8 Startup Sequence.
-   Use BUILD_PLAN.md Sequential lane first; respect AGENT/HUMAN/ADB/AUTO labels.
-   ```
-
-4. **Agent shortcuts:** bookmark **[docs/help/BATCH_COMMANDS.md](docs/help/BATCH_COMMANDS.md)** — type `/` in Agent chat (`/bootstrap` · `/verify` · `/build` · `/ship`). *Bookmark it for when you come back after a break.*
-
-## Agent shortcuts (cheat sheet)
-
-**[docs/help/BATCH_COMMANDS.md](docs/help/BATCH_COMMANDS.md)** — shortcut commands for Cursor Agent.
-
-- `/bootstrap` — new project Sprint 0 end to end
-- `/build` — plan and implement a feature
-- `/verify` — checks before merge
-- `/ship` — publish a release to GitHub
-
-Type **`/`** in Agent chat to pick a command. *Bookmark it for when you come back after a break.*
-
-## Stack Selection (Sprint 0)
-
-During `init-project`, choose `web`, `python`, `android`, `multi`, or `none` (keep all).
-
-Active modules are synced to `AGENT_MEMORY.md` and recorded in `.cursor/stack-selection.json`.
-
-<p>
-  <img src="https://img.shields.io/badge/web-stack-646cff?style=flat-square" alt="web" />
-  <img src="https://img.shields.io/badge/python-stack-3776AB?style=flat-square" alt="python" />
-  <img src="https://img.shields.io/badge/android-stack-3DDC84?style=flat-square" alt="android" />
-  <img src="https://img.shields.io/badge/multi-all_stacks-0969da?style=flat-square" alt="multi" />
-  <img src="https://img.shields.io/badge/none-keep_all-656d76?style=flat-square" alt="none" />
-</p>
-
----
-
-*How agents work*
-
-## What's Included
-
-<details>
-<summary><strong>Component catalog</strong> — onboarding, memory, security, examples, tooling</summary>
-
-<h4>Onboarding & agents</h4>
-<dl>
-  <dt>Initialization prompt</dt>
-  <dd><a href="docs/INITIALIZATION_PROMPT.md"><code>docs/INITIALIZATION_PROMPT.md</code></a></dd>
-  <dt>Agent routing</dt>
-  <dd><a href="docs/START_HERE.md"><code>docs/START_HERE.md</code></a>, <a href="docs/CURSOR_MODES.md"><code>docs/CURSOR_MODES.md</code></a>, <a href="docs/FOR_AGENTS.md"><code>docs/FOR_AGENTS.md</code></a>, <a href="AGENTS.md"><code>AGENTS.md</code></a></dd>
-  <dt>Agent shortcuts</dt>
-  <dd><a href="docs/help/BATCH_COMMANDS.md"><code>docs/help/BATCH_COMMANDS.md</code></a> — slash commands (<code>/bootstrap</code>, <code>/verify</code>, <code>/build</code>, <code>/ship</code>)</dd>
-  <dt>Sprint task board</dt>
-  <dd><a href="BUILD_PLAN.md"><code>BUILD_PLAN.md</code></a> (active board); archived sprints in <a href="COMPLETED_TASKS.md"><code>COMPLETED_TASKS.md</code></a></dd>
-</dl>
-
-<h4>Memory & decisions</h4>
-<dl>
-  <dt>Workspace memory</dt>
-  <dd><a href="AGENT_MEMORY.md"><code>AGENT_MEMORY.md</code></a>, <a href="DECISION_LOG.md"><code>DECISION_LOG.md</code></a>, <a href="KNOWLEDGE_BASE.md"><code>KNOWLEDGE_BASE.md</code></a></dd>
-</dl>
-
-<h4>Security & operations</h4>
-<dl>
-  <dt>Security & privacy</dt>
-  <dd><a href="SECURITY.md"><code>SECURITY.md</code></a>, <a href="docs/SECURITY_TRIAGE.md"><code>docs/SECURITY_TRIAGE.md</code></a>, <a href="docs/THREAT_MODEL.md"><code>docs/THREAT_MODEL.md</code></a>, <a href="docs/PRIVACY.md"><code>docs/PRIVACY.md</code></a></dd>
-  <dt>Operations</dt>
-  <dd><a href="docs/RUNBOOK.md"><code>docs/RUNBOOK.md</code></a></dd>
-  <dt>License attribution</dt>
-  <dd><a href="THIRD_PARTY_LICENSES.md"><code>THIRD_PARTY_LICENSES.md</code></a>, <a href="LICENSE"><code>LICENSE</code></a></dd>
-</dl>
-
-<h4>Examples & tooling</h4>
-<dl>
-  <dt>Stack modules</dt>
-  <dd><code>modules/{web,python,android,lightroom,rust,go}/MODULE.md</code></dd>
-  <dt>Golden Path examples</dt>
-  <dd><code>examples/{web,python,android,node}/</code>; optional <code>lightroom/</code>, <code>rust/</code>, <code>go/</code> — see <a href="docs/OPTIONAL_STACKS.md"><code>docs/OPTIONAL_STACKS.md</code></a></dd>
-  <dt>Agent documentation</dt>
-  <dd><code>docs/</code> — prompts, security, design guide (<strong>not</strong> the public website)</dd>
-  <dt>Public website source</dt>
-  <dd><a href="examples/web/"><code>examples/web/</code></a> (Vite PWA source; see <a href="docs/WEB_PROJECT_LAYOUT.md"><code>docs/WEB_PROJECT_LAYOUT.md</code></a>)</dd>
-  <dt>GitHub Pages deploy</dt>
-  <dd><code>.github/workflows/pages.yml</code> → <code>examples/web/dist</code> (Actions artifact)</dd>
-  <dt>CI guardrails</dt>
-  <dd><code>.github/workflows/</code> (incl. OpenSSF Scorecard weekly)</dd>
-  <dt>Cursor rules</dt>
-  <dd><code>.cursor/rules/*.mdc</code> (incl. <code>cursor-modes.mdc</code>, <code>batch-commands.mdc</code> — see <a href="docs/CURSOR_MODES.md"><code>docs/CURSOR_MODES.md</code></a> and <a href="docs/help/BATCH_COMMANDS.md"><code>docs/help/BATCH_COMMANDS.md</code></a>)</dd>
-</dl>
-
-</details>
-
-## BUILD_PLAN Labels
-
-Every task carries an owner label for filtering automated vs human work.
-
-**Status markers:** 🔲 open · ✅ done · ❌ blocked — use emoji on all checklist rows (not `- [ ]` checkboxes) so state is clear in Markdown source and Preview. See [`BUILD_PLAN.md`](BUILD_PLAN.md) legend.
-
-> [!TIP]
-> Filter tasks by owner: `grep '\[AGENT\]' BUILD_PLAN.md` (also `HUMAN`, `ADB`, `AUTO`).
-
-<table>
-  <thead>
-    <tr>
-      <th>Label</th>
-      <th>Owner</th>
-      <th>When to use</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><img src="https://img.shields.io/badge/AGENT-Cursor_Agent-2ea043?style=flat-square" alt="AGENT" /></td>
-      <td>Cursor Agent</td>
-      <td>Code, docs, scaffolding, tests, CI</td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/HUMAN-Human_Developer-0969da?style=flat-square" alt="HUMAN" /></td>
-      <td>Human developer</td>
-      <td>Approvals, credentials, GitHub settings</td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/ADB-Android_Device-bf8700?style=flat-square" alt="ADB" /></td>
-      <td>Human (Android)</td>
-      <td>Device testing, F-Droid submission</td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/AUTO-CI_Scripts-656d76?style=flat-square" alt="AUTO" /></td>
-      <td>CI/scripts</td>
-      <td>GitHub Actions, Dependabot, pre-commit</td>
-    </tr>
-  </tbody>
-</table>
+## Quick start (web)
 
 ```bash
-grep '\[AGENT\]' BUILD_PLAN.md
-grep '\[HUMAN\]' BUILD_PLAN.md
-grep '\[ADB\]' BUILD_PLAN.md
-grep '\[AUTO\]' BUILD_PLAN.md
+cd examples/web
+npm ci
+npm run dev
 
 ```
 
-Each sprint has **Sequential** (ordered) and **Parallel** (isolated scope) lanes in the child-repo playbook. Template maintainers: active board is **maintenance + human open items**; completed maintainer sprints are archived in [`COMPLETED_TASKS.md`](COMPLETED_TASKS.md). See [`BUILD_PLAN.md`](BUILD_PLAN.md).
+Open the URL Vite prints (default `http://localhost:5173`). On an empty vault you land on Welcome.
 
-## GitHub Pages Demo
-
-The `examples/web` PWA deploys to GitHub Pages on push to `main` (workflow: `.github/workflows/pages.yml`). The build sets `VITE_BASE_PATH` for project-site hosting with no analytics or tracking scripts.
-
-> [!WARNING]
-> **`docs/` is not your website.** Agent instructions live in `docs/`; only `examples/web/dist/` is deployed. Set Pages source to **GitHub Actions**, not "Deploy from `/docs`". See [`docs/WEB_PROJECT_LAYOUT.md`](docs/WEB_PROJECT_LAYOUT.md).
-
----
-
-*Operations*
-
-## Template Update Checker
-
-<details>
-<summary><strong>Upstream release checks</strong> — intervals, manual commands, devcontainer</summary>
-
-Child repos can check for new upstream template releases on GitHub.
-
-Configure in [`.template-update.json`](.template-update.json):
-
-![default](https://img.shields.io/badge/default-weekly-2ea043?style=flat-square)
-
-<dl>
-  <dt><code>off</code></dt>
-  <dd>Disabled</dd>
-  <dt><code>daily</code></dt>
-  <dd>Check at most once per day</dd>
-  <dt><code>weekly</code> (default)</dt>
-  <dd>Check at most once per week</dd>
-  <dt><code>monthly</code></dt>
-  <dd>Check at most once per month</dd>
-  <dt><code>on_session</code></dt>
-  <dd>Check every devcontainer/session start</dd>
-</dl>
-
-`notify_method` supports `stdout` only (banner printed to terminal).
-
-**Change interval:** edit `.template-update.json` or re-run the init script.
-
-**Manual check:**
+Tests and production build:
 
 ```bash
-bash scripts/check-template-updates.sh
-# or
-pwsh scripts/check-template-updates.ps1
+npm test
+npm run build
+npm run preview
 
 ```
 
-Runs automatically on devcontainer start. When a new version is available, see [`docs/UPGRADING_FROM_TEMPLATE.md`](docs/UPGRADING_FROM_TEMPLATE.md).
+More detail: [`examples/web/README.md`](examples/web/README.md).
 
-The devcontainer also runs `check-file-encoding.sh` on start, includes the **GitHub CLI** (`gh`) for `validate-workflow-actions.sh`, and prints a reminder to run `check-github-ci.sh --wait 300` after pushing to `main`.
+## Optional Google Drive sync
 
-</details>
+1. Copy [`examples/web/.env.example`](examples/web/.env.example) → `examples/web/.env.local`.
+2. Create a **Google Cloud OAuth 2.0 Web client**; enable **Google Drive API**.
+3. Set authorized JavaScript origins: `http://localhost:5173`, `capacitor://localhost`, `https://localhost`.
+4. Set `VITE_GOOGLE_CLIENT_ID=` in `.env.local` and restart dev/build.
 
-## GitHub CI Gate (post-push)
+Sign in under **Settings → Google Drive**. Sync reads/writes `SelfChronicle/vault-pack.json` in the signed-in account. Vault namespaces: `local:default` until Drive sign-in, then `google:{sub}`.
 
-<details>
-<summary><strong>Post-push scripts</strong> — CI poll, repo setup, pre-release gate</summary>
+## Android debug build
 
-After pushing workflow or dependency changes to `main`, poll required workflows:
+Requires JDK 21 and Android SDK. Full commands: [`examples/native/README.md`](examples/native/README.md).
 
 ```bash
-bash scripts/check-github-ci.sh --wait 300
-# Windows:
-pwsh scripts/check-github-ci.ps1 -WaitSeconds 300
+cd examples/web
+npm run build
+npx cap sync android
+cd android && ./gradlew assembleDebug
 
 ```
 
-Required status checks (branch protection via `scripts/setup-github-repo.sh`): **CI**, **Security Scan**, **CodeQL**, **Repo Hygiene**, **Feature Gate**. `check-github-ci` polls the three workflow rollups; **Repo Hygiene** and **Feature Gate** are jobs inside the **CI** workflow.
+APK: `examples/web/android/app/build/outputs/apk/debug/app-debug.apk` — sideload with `adb install -r …`. First launch shows Welcome on an empty vault (same as web).
 
-One-time repo security setup (Dependabot alerts, private reporting, branch protection):
+## Vault architecture (current)
+
+- **One namespace per profile** — `local:default` or `google:{sub}` after Drive bind.
+- **One Evidence store** — every import path commits provisional Evidence; provenance is tags only, not separate silos.
+- **Merge policy** (Drive / pack import) — union by file path; when both sides have a path, keep the document with the newer `updated_at`.
+
+Design docs: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) · [`docs/PRIVACY.md`](docs/PRIVACY.md).
+
+## Stack
+
+| Surface | Path | Package |
+|---------|------|---------|
+| PWA (primary) | `examples/web/` | `selfchronicle-web` |
+| Android (Capacitor) | `examples/web/android/` | wraps PWA `dist/` |
+| MCP / tools host | `examples/node/` | `selfchronicle-mcp` |
+Bootstrapped from [agent-project-bootstrap](https://github.com/edwardlthompson/agent-project-bootstrap) (see `.template-version`).
+
+### MCP host (optional)
 
 ```bash
-bash scripts/setup-github-repo.sh
-# Windows:
-pwsh scripts/setup-github-repo.ps1
+cd examples/node
+npm ci
+npm run dev
 
 ```
 
-Before any version bump or release tag:
+## Start here
 
-```bash
-bash scripts/pre-release-gate.sh
-# Windows:
-pwsh scripts/pre-release-gate.ps1
+| Doc | Purpose |
+|-----|---------|
+| [docs/START_HERE.md](docs/START_HERE.md) | Human + agent entry |
+| [docs/PLANNING_INDEX.md](docs/PLANNING_INDEX.md) | Product design index |
+| [BUILD_PLAN.md](BUILD_PLAN.md) | Sprint board |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design |
+| [docs/PRIVACY.md](docs/PRIVACY.md) / [docs/SECURITY.md](docs/SECURITY.md) | Privacy & security |
+| [AGENTS.md](AGENTS.md) | Cursor agent router |
+**Do not commit** `.env`, `.env.local`, personal vault packs, or export dumps.
 
-```
+## License
 
-</details>
-
-## Security
-
-### Dependabot alerts (one-time setup)
-
-> [!IMPORTANT]
-> **`[HUMAN]`** Enable **Dependabot alerts** and **Dependabot security updates** under **Settings → Code security and analysis**.
-
-See [`docs/SECURITY_TRIAGE.md`](docs/SECURITY_TRIAGE.md) for the full setup and weekly triage checklist.
-
-Report vulnerabilities via [`SECURITY.md`](SECURITY.md) (private reporting preferred).
-
-Community standards: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
-
-<details>
-<summary><strong>Weekly CVE triage</strong> — recommended Monday checklist</summary>
-
-`[HUMAN]` runs a weekly triage pass (recommended: Monday):
-
-1. Review Dependabot alerts (Critical/High first)
-2. Triage open Dependabot PRs (fix / defer / dismiss)
-3. Confirm Trivy + CodeQL CI green after merges
-
-</details>
-
----
-
-*Stacks & layout*
-
-## Supported Stacks
-
-<table>
-  <thead>
-    <tr>
-      <th>Stack</th>
-      <th>Guide</th>
-      <th>Example</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><img src="https://img.shields.io/badge/Web-PWA-646cff?style=flat-square" alt="Web / PWA" /></td>
-      <td><a href="modules/web/MODULE.md"><code>modules/web/MODULE.md</code></a></td>
-      <td><a href="examples/web/"><code>examples/web/</code></a></td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/Python-API-3776AB?style=flat-square" alt="Python" /></td>
-      <td><a href="modules/python/MODULE.md"><code>modules/python/MODULE.md</code></a></td>
-      <td><a href="examples/python/"><code>examples/python/</code></a></td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/Android-F--Droid-3DDC84?style=flat-square" alt="Android / F-Droid" /></td>
-      <td><a href="modules/android/MODULE.md"><code>modules/android/MODULE.md</code></a></td>
-      <td><a href="examples/android/"><code>examples/android/</code></a></td>
-    </tr>
-    <tr>
-      <td><img src="https://img.shields.io/badge/Lightroom-Plugin-31A8FF?style=flat-square" alt="Lightroom plugin" /></td>
-      <td><a href="modules/lightroom/MODULE.md"><code>modules/lightroom/MODULE.md</code></a></td>
-      <td><a href="examples/lightroom/"><code>examples/lightroom/</code></a></td>
-    </tr>
-  </tbody>
-</table>
-
-<p>
-  <strong>Optional stacks:</strong>
-  <img src="https://img.shields.io/badge/Node-stack%20picker-2ea44f?style=flat-square" alt="Node" />
-  <img src="https://img.shields.io/badge/Rust-optional-656d76?style=flat-square" alt="Rust" />
-  <img src="https://img.shields.io/badge/Go-optional-656d76?style=flat-square" alt="Go" />
-  — optional stacks in <a href="docs/OPTIONAL_STACKS.md"><code>docs/OPTIONAL_STACKS.md</code></a>.
-</p>
-
-Machine-readable catalog: [`TEMPLATE_INDEX.json`](TEMPLATE_INDEX.json)
-
-## Repository Layout
-
-<details>
-<summary><strong>Folder map</strong> — docs, modules, examples, scripts</summary>
-
-```
-docs/           Agent docs only (NOT the public website) — see docs/WEB_PROJECT_LAYOUT.md
-modules/        Stack-specific agent rules (activate matching stack only)
-examples/       Golden Path reference implementations
-examples/web/   PWA source; dist/ published via GitHub Actions
-scripts/        Init, update checker, validation
-.cursor/rules/  Persistent Cursor agent directives
-.github/        CI workflows, Dependabot, issue templates
-
-```
-
-</details>
-
----
-
-*Project meta*
-
-## Contributing
-
-MIT licensed. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
-
-Template maintainers: [`docs/MAINTAINING_THE_TEMPLATE.md`](docs/MAINTAINING_THE_TEMPLATE.md)
-
-## GitHub About
-
-Repo description draft for the short About preview: [`docs/GITHUB_ABOUT.md`](docs/GITHUB_ABOUT.md)
-
-## Maintainer Release
-
-Current template version: **0.15.1** (see `.template-version`, Release Please, and `scripts/pre-release-gate.sh`).
+MIT — see [LICENSE](LICENSE).

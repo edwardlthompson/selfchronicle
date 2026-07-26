@@ -7,55 +7,57 @@
 
 | Layer | Technology | Version | Notes |
 |-------|-----------|---------|-------|
-| Platform | Multi-stack template (Web, Python, Android, Node, optional Lightroom/Rust/Go) | 0.15.1 | Template maintainer repo |
+| Platform | Web/PWA + Node MCP | template 0.15.1 | Child of agent-project-bootstrap |
+| Web | Vite + TypeScript + Vitest + Playwright | `examples/web` | Package `selfchronicle-web` |
+| Node | Hono + Vitest | `examples/node` | Package `selfchronicle-mcp` |
+| Vault | Markdown + YAML; SQLite index | planned | Files SoT (ADR-0001) |
+| Sync crypto | age | planned | Ciphertext-only |
+| Local crypto | libsodium + Argon2id | planned | Sensitive sections / KDF |
 | License | MIT | - | Pure FOSS |
-| Distribution | GitHub Releases + GitHub Pages demo | - | F-Droid/Winget stubs for child repos |
-
+| Distribution | GitHub Releases + Pages | - | No telemetry by default |
 ## Active Modules
 
 - ✅ Web / PWA (`modules/web/MODULE.md`)
-- ✅ Python (`modules/python/MODULE.md`)
-- ✅ Android / F-Droid (`modules/android/MODULE.md`)
-- ✅ Node API (`modules/node/MODULE.md`)
-- ✅ Lightroom Classic (`modules/lightroom/MODULE.md`)
-- ✅ Rust (`modules/rust/MODULE.md`)
-- ✅ Go (`modules/go/MODULE.md`)
+- ✅ Node API / MCP (`modules/node/MODULE.md`)
+- ❌ Python / Android / Rust / Go / Lightroom (pruned)
 
 ## Threat Model Checklist
 
-- ✅ `docs/THREAT_MODEL.md` drafted (STRIDE, trust boundaries, top abuse cases)
+- ✅ `docs/THREAT_MODEL.md` drafted for SelfChronicle
+- ✅ `docs/SECURITY.md` / `docs/PRIVACY.md` product design
 - ✅ No proprietary closed-source SDKs in production path
-- ✅ Opt-in only telemetry (GDPR/CCPA compliant); see `docs/PRIVACY.md`
+- ✅ Opt-in only telemetry (default off)
 - ✅ Secrets excluded from VCS (Gitleaks pre-commit)
 - ✅ Dependency vulnerability scanning enabled (CodeQL + Trivy + Dependabot)
-- ✅ Input validation at all data boundaries
-- ✅ `SECURITY.md` and private vulnerability reporting enabled
+- 🔲 Vault crypto + MCP grants implemented (later sprints)
 
 ## Persistent Context
 
 ### Project Purpose
 
-FOSS Cursor agent bootstrap template: labeled BUILD_PLAN sprints, Golden Path examples, CI guardrails, workspace memory, and design-system cohesion across Web and Android.
+SelfChronicle: privacy-first local memory & living biography — Evidence → Facts → Biography/Profile → LLM handoff/MCP, with Companion Trust and provisional soft layers.
 
 ### Key Constraints
 
+- Hexagonal architecture (ADR-0001)
+- No silent scraping; user-initiated imports only
+- MIT; telemetry **off by default**
 - Max 300 lines per static data file (UI + i18n), 150 lines per pure logic file
 - Trunk-based development with Conventional Commits
 - Strict type safety and test coverage budgets
+
+### Agent command bookmark
+
+- Human cheat sheet: [`docs/help/BATCH_COMMANDS.md`](docs/help/BATCH_COMMANDS.md) — `/bootstrap`, `/build`, `/verify`, `/ship`
 
 ## Session Retrospectives
 
 | Date | Milestone | What worked | What to improve |
 |------|-----------|-------------|-----------------|
-| 2026-07-22 | v0.15.0 /ship | RP #37 merged; fixed duplicate CHANGELOG Unreleased + Node 25 vitest localStorage before CI green | Confirm single Unreleased before push; watch GH Dependabot banner vs triage script |
-| 2026-07-21 | M33 Cursor feature integration | Native worktrees + permissions + 7 skills + plugin pack + CLI example; commercial docs deepened | Keep pack script globs wholesale when adding skills; residual Auto-review classifier drift |
-| 2026-07-12 | v0.14.1 release | /push merged RP #36; fixed Dependabot alert API + FOSS mcp.json gate | Prefer AUTOMERGE_TOKEN over admin merge fallback for RP |
-| 2026-07-12 | M32 audit | Caught GITHUB_TOKEN automerge skipping push CI; Git Bash preference for Windows agent-run | Completed via HUMAN automation; GitHub MCP enabled locally |
-| 2026-06-13 | v0.6.0 design system | Cross-stack tokens + i18n scaffold | Restore optional-stack CI jobs after large merge |
-| 2026-06-30 | Autonomous /build + HUMAN automation | Grouped human section keeps board readable; automation router backlogs failures only | Release Please PR #20 for 0.12.0 needs human merge |
-
+| 2026-07-26 | v0.1.0 release | P0–P2 sprints shipped; gates green locally; explicit-path commit | CI wait post-push; M34 HUMAN follow-ups remain |
 ## Template Provenance
 
-- **Source template:** `edwardlthompson/agent-project-bootstrap` (self-maintained)
+- **Source template:** `edwardlthompson/agent-project-bootstrap`
 - **Template version:** `0.15.1` (see `.template-version`)
+- **Child repo:** `edwardlthompson/selfchronicle`
 - **Last update check:** See `.template-update.json`

@@ -39,6 +39,13 @@ trap restore EXIT
 
 echo "=== About feature gate verification ==="
 
+# Child apps with an integrated vault shell cannot simulate full AppShell removal
+# (SelfChronicle and similar — About is wired through appBootstrap, not a standalone slice).
+if [ -d "$WEB_SRC/vault" ] && [ -f "$WEB_SRC/appBootstrap.ts" ]; then
+  echo "SKIP: vault-integrated child app — About lego gate applies to template golden path only"
+  exit 0
+fi
+
 echo "1/2 Gate with About feature present..."
 bash scripts/feature-gate.sh --stack web --step about-with
 
@@ -54,10 +61,12 @@ cp -a "$WEB_E2E/app.spec.ts" "$BACKUP/app.spec.ts"
 
 $PY << 'PY'
 from pathlib import Path
+import json
 import shutil
 
 web = Path("examples/web/src")
 e2e = Path("examples/web/e2e")
+app_title = json.loads((web / "locales/en.json").read_text(encoding="utf-8"))["app.title"]
 
 web.joinpath("main.ts").write_text(
     """import "./style.css";
@@ -132,13 +141,13 @@ for path in (
         path.unlink()
 
 e2e.joinpath("app.spec.ts").write_text(
-    """import { test, expect } from "@playwright/test";
+    f"""import {{ test, expect }} from "@playwright/test";
 
-test("renders golden path heading without About slice", async ({ page }) => {
+test("renders app heading without About slice", async ({{ page }}) => {{
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Golden Path PWA" })).toBeVisible();
+  await expect(page.getByRole("heading", {{ name: {json.dumps(app_title)} }})).toBeVisible();
   await expect(page.getByTestId("status")).toBeVisible();
-});
+}});
 """,
     encoding="utf-8",
 )

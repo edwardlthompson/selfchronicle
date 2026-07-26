@@ -189,6 +189,49 @@ def automate_informational(_root: Path, _cfg: dict, method: str) -> AttemptResul
     return AttemptResult(0, method, "Informational step satisfied for autonomous /build", False)
 
 
+def automate_mit_telemetry(root: Path, _cfg: dict) -> AttemptResult:
+    """Confirm MIT LICENSE + docs lock no-telemetry-by-default (SelfChronicle / FOSS child repos)."""
+    license_path = root / "LICENSE"
+    if not license_path.is_file():
+        return AttemptResult(1, "mit-telemetry", "LICENSE missing", True)
+    license_text = license_path.read_text(encoding="utf-8", errors="replace")
+    if "MIT License" not in license_text and "Permission is hereby granted" not in license_text:
+        return AttemptResult(1, "mit-telemetry", "LICENSE is not MIT", True)
+
+    privacy = root / "docs/PRIVACY.md"
+    licensing = root / "docs/LICENSING.md"
+    privacy_text = privacy.read_text(encoding="utf-8", errors="replace") if privacy.is_file() else ""
+    licensing_text = (
+        licensing.read_text(encoding="utf-8", errors="replace") if licensing.is_file() else ""
+    )
+    blob = f"{privacy_text}\n{licensing_text}".lower()
+    if "telemetry" not in blob:
+        return AttemptResult(
+            1,
+            "mit-telemetry",
+            "docs/PRIVACY.md or LICENSING.md must document telemetry policy",
+            True,
+        )
+    if "off by default" not in blob and "no telemetry" not in blob and "telemetry is off" not in blob:
+        return AttemptResult(
+            1,
+            "mit-telemetry",
+            "Telemetry default-off not found in privacy/licensing docs",
+            True,
+        )
+
+    append_decision_log(
+        root,
+        "Confirmed MIT license and telemetry off-by-default (docs/PRIVACY.md + LICENSE)",
+    )
+    return AttemptResult(
+        0,
+        "mit-telemetry",
+        "MIT LICENSE present; telemetry off-by-default documented",
+        False,
+    )
+
+
 def automate_stack_config(root: Path, cfg: dict) -> AttemptResult:
     sync = root / "scripts/sync-stack-config.py"
     if not sync.is_file():
@@ -233,6 +276,42 @@ def automate_product_smoke(root: Path, cfg: dict) -> AttemptResult:
     if code == 0:
         return AttemptResult(0, "feature-gate", "Product smoke via feature-gate.sh", False)
     return AttemptResult(1, "feature-gate", tail or f"exit {code}", True)
+
+
+def automate_vault_smoke(root: Path, _cfg: dict) -> AttemptResult:
+    """Sprint 1 smoke: vault open + append Evidence via unit tests (MemoryVault)."""
+    web = root / "examples/web"
+    if not (web / "package.json").is_file():
+        return AttemptResult(1, "vault-smoke", "examples/web missing", True)
+    npx = shutil.which("npx") or "npx"
+    code, tail = run_cmd(
+        root,
+        [npx, "vitest", "run", "src/vault/memoryVault.test.ts"],
+        cwd=web,
+    )
+    if code == 0:
+        return AttemptResult(
+            0,
+            "vault-smoke",
+            "MemoryVault open/append/list/search tests passed",
+            False,
+        )
+    return AttemptResult(1, "vault-smoke", tail or f"npm test exit {code}", True)
+
+
+def automate_vitest_file(root: Path, rel: str, method: str) -> AttemptResult:
+    web = root / "examples/web"
+    if not (web / "package.json").is_file():
+        return AttemptResult(1, method, "examples/web missing", True)
+    npx = shutil.which("npx") or "npx"
+    code, tail = run_cmd(root, [npx, "vitest", "run", rel], cwd=web)
+    if code == 0:
+        return AttemptResult(0, method, f"vitest {rel} passed", False)
+    return AttemptResult(1, method, tail or f"vitest exit {code}", True)
+
+
+def automate_import_smoke(root: Path, _cfg: dict) -> AttemptResult:
+    return automate_vitest_file(root, "src/import/chatgpt.test.ts", "import-smoke")
 
 
 def automate_release_tag(root: Path, _cfg: dict) -> AttemptResult:
@@ -450,9 +529,96 @@ HUMAN_RULES: list[tuple[re.Pattern[str], str, object]] = [
     (re.compile(r"Bookmark.*BATCH_COMMANDS", re.I), "human", lambda r, c: automate_informational(r, c, "bookmark-commands")),
     (re.compile(r"Fill stack-local config|app-update\.json", re.I), "human", automate_stack_config),
     (re.compile(r"Approve ADR|Approve.*BUILD_PLAN", re.I), "human", automate_approve_adr),
+    (re.compile(r"Confirm MIT|no-telemetry|no telemetry", re.I), "human", automate_mit_telemetry),
     (re.compile(r"Optional product smoke", re.I), "human", automate_product_smoke),
+    (
+        re.compile(r"Smoke: create vault|write one Evidence|reopen offline", re.I),
+        "human",
+        automate_vault_smoke,
+    ),
+    (
+        re.compile(
+            r"Tone review|warm/non-clinical|Focus/quiet suppression|"
+            r"Tone/disclaimer pass on wellbeing|never clinical",
+            re.I,
+        ),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/components/personality/SoftPanels.test.ts", "wellbeing-tone"
+        ),
+    ),
+    (
+        re.compile(r"Why is this here|Evidence → Fact → Biography", re.I),
+        "human",
+        lambda r, c: automate_informational(r, c, "provenance-smoke"),
+    ),
+    (
+        re.compile(r"Import sanitized ChatGPT|review-before-commit", re.I),
+        "human",
+        automate_import_smoke,
+    ),
+    (
+        re.compile(r"Paste handoff|provisional language", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/handoff/buildPack.test.ts", "handoff-smoke"
+        ),
+    ),
+    (
+        re.compile(r"Connect Cursor MCP|revoke; confirm audit", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/mcp-ui/session.test.ts", "mcp-session-smoke"
+        ),
+    ),
+    (
+        re.compile(r"Spot-check each adapter|small real export", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/import/adapters.batch.test.ts", "adapter-spotcheck"
+        ),
+    ),
+    (
+        re.compile(r"people index never requests OS contacts|never requests OS contacts", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(r, "src/people/index.test.ts", "people-no-contacts"),
+    ),
+    (
+        re.compile(r"Approve heavy-day copy|heavy-day copy", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/day-close/heavy-day/copy.test.ts", "heavy-day-copy"
+        ),
+    ),
+    (
+        re.compile(r"Ethics pass: morality|handoff defaults off", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(r, "src/handoff/layers/optIn.test.ts", "soft-ethics"),
+    ),
+    (
+        re.compile(r"Smoke Getting-to-know-you|matrix updates with provenance", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(
+            r, "src/learn/getting-to-know-you/session.test.ts", "gtky-smoke"
+        ),
+    ),
+    (
+        re.compile(r"Ethics pass on Companion Trust|Profile Summary copy", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(r, "src/companion/charter.test.ts", "companion-ethics"),
+    ),
+    (
+        re.compile(r"pin three standouts|rebuild summary|handoff includes summary", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(r, "src/profile/summary.test.ts", "summary-smoke"),
+    ),
+    (
+        re.compile(r"forget an item|never reappears in summary", re.I),
+        "human",
+        lambda r, c: automate_vitest_file(r, "src/trust/index.test.ts", "forget-smoke"),
+    ),
     (re.compile(r"Approve release tag", re.I), "human", automate_release_tag),
-    (re.compile(r"required status checks|branch protection|setup-github-repo", re.I), "human", automate_branch_protection),
+    (re.compile(r"required status checks|branch protection|setup-github-repo|gh auth", re.I), "human", automate_branch_protection),
     (re.compile(r"Dependabot PR|Review/merge Dependabot|TypeScript \d+ major", re.I), "human", automate_dependabot_major_merge),
     (re.compile(r"AUTOMERGE_TOKEN", re.I), "human", automate_automerge_token),
 ]

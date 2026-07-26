@@ -154,7 +154,10 @@ def parse_sprint_blocks(text: str) -> list[tuple[str, list[str]]]:
     lines = text.splitlines()
     while i < len(lines):
         line = lines[i]
-        if line.strip().startswith("## Child Repo Playbook"):
+        # Child product boards: template playbook or SelfChronicle active board
+        if line.strip().startswith("## Child Repo Playbook") or line.strip().startswith(
+            "## SelfChronicle"
+        ):
             in_child = True
             i += 1
             continue

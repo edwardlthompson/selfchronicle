@@ -1,13 +1,9 @@
 # GitHub About Block
 
-## Template Repo Description (350 chars max)
+## Draft Description (edit to <=350 chars)
 
-Cursor agent bootstrap template for FOSS projects. Labeled BUILD_PLAN sprints, configurable GitHub update checker, Dependabot CVE triage, CI guardrails, workspace memory, and Golden Path stubs (Web, Python, Android). MIT.
+SelfChronicle — privacy-first, local-first personal memory & living biography. User-owned vault, injectable LLM profile, zero-knowledge sync. FOSS MIT.
 
 ## Topics
 
-cursor, agent, template-repository, foss, mit, github-actions, pwa, python, android
-
-## Child Project Draft
-
-[PROJECT_NAME] — [ONE_LINE_PURPOSE]. Built with agent-project-bootstrap. FOSS MIT.
+`selfchronicle` `local-first` `privacy` `pwa` `foss` `mit` `personal-knowledge` `zero-knowledge` `mcp` `biography`

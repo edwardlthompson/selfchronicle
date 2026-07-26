@@ -1,53 +1,46 @@
-# ADR-0001: Core Application Architecture (Child Repo)
+# ADR-0001: Core Application Architecture (SelfChronicle)
 
-- **Status:** Proposed (fill during Sprint 1)
-- **Date:** YYYY-MM-DD
-- **Deciders:** Project team
+- **Status:** Accepted
+- **Date:** 2026-07-26
+- **Deciders:** edwardlthompson (+ agents per BUILD_PLAN)
 
-> Template for child repositories. Template-repo baseline ADR is `docs/adr/0000-template-baseline.md`.
+> Template-repo baseline ADR remains `docs/adr/0000-template-baseline.md`.
 
 ## Context
 
-Choose a primary architecture pattern for the application layer. Document the choice before Golden Path implementation.
+SelfChronicle is a privacy-first, local-first personal memory and living biography system. It needs:
+
+- A durable **vault** of plain files the user can inspect outside the app
+- Multiple delivery surfaces over time (PWA now; Node MCP; later Capacitor/TWA, extension)
+- Strict privacy (no silent scraping; optional sync is ciphertext-only)
+- Soft psychological layers that stay provisional and user-editable
 
 ## Decision
 
-**Selected pattern:** 🔲 MVVM  🔲 Clean Architecture  🔲 Hexagonal (Ports & Adapters)
+**Selected pattern:** Hexagonal (Ports & Adapters)
 
-### MVVM
+- **Domain core:** Evidence, Facts, Biography, Curiosity, soft profiles (Personality, Morality, Cognition, Wellbeing), provenance rules — no framework imports
+- **Ports:** `vault.open/status`, `evidence.*`, `facts.*`, `biography.*`, `import.*`, `handoff.export`, `audit.*`, later MCP-facing ports
+- **Adapters:** PWA UI, OPFS/filesystem, SQLite FTS index (rebuildable), age/libsodium crypto, Node MCP host, import parsers
 
-- **View:** UI components (web components, Android Jetpack Compose, CLI output)
-- **ViewModel:** Presentation state, user actions, no platform SDK calls
-- **Model:** Domain + data services
+**Source of truth:** Markdown + YAML frontmatter on disk. SQLite (and optional embeddings) are **derived indexes** only.
 
-**When:** UI-heavy apps with clear screen-level state.
+**Clients:** Web/PWA primary (`examples/web` → `selfchronicle-web`); Node secondary for MCP (`examples/node` → `selfchronicle-mcp`).
 
-### Clean Architecture
-
-- **Entities:** Enterprise business rules
-- **Use cases:** Application-specific rules
-- **Interface adapters:** Controllers, presenters, gateways
-- **Frameworks:** DB, web framework, device APIs
-
-**When:** Long-lived products with multiple delivery surfaces.
-
-### Hexagonal
-
-- **Ports:** Interfaces the app exposes or requires
-- **Adapters:** HTTP, DB, CLI, Android Activities wired to ports
-- **Domain core:** No inward dependencies
-
-**When:** Strong testability and swappable infrastructure matter most.
+**Crypto defaults:** age for sync packs; libsodium + Argon2id for local sensitive sections / key derivation. See `docs/SECURITY.md`.
 
 ## Consequences
 
-- Golden Path feature must respect layer boundaries chosen above
-- CI coverage and lint gates apply per `examples/{stack}/` conventions
+- Feature work locks port APIs before UI (BUILD_PLAN Sequential → Parallel)
+- Replacing storage or adding Capacitor/TWA should not rewrite domain rules
+- Import adapters are peripheral; vault write path always goes through Evidence ports + audit
 - Changing this ADR later requires a new ADR and BUILD_PLAN `[HUMAN]` approval
 
 ## Alternatives Considered
 
 | Pattern | Rejected because |
 |---------|------------------|
-| Monolith MVC | TBD |
-| No structure | TBD |
+| MVVM only | Fine for screens; weak for multi-adapter vault/MCP/sync boundary |
+| Clean Architecture (full) | Heavier ceremony than needed for FOSS PWA+MCP; hexagonal ports match adapters better |
+| Monolith MVC in UI | Couples vault lifetime to framework; hard to share with Node MCP |
+| No structure | Violates testability and privacy boundary reviews |

@@ -417,7 +417,7 @@
     },
     {
       "path": ".github/workflows/dependency-review.yml",
-      "purpose": "PR dependency review — fail on new High/Critical vulnerabilities",
+      "purpose": "PR dependency review \u2014 fail on new High/Critical vulnerabilities",
       "read_when": "contributing",
       "update_when": "milestone_boundary",
       "owner": "maintainer"
@@ -769,48 +769,6 @@
       "path": ".release-please-manifest.json",
       "purpose": "Release Please version manifest",
       "read_when": "milestone_boundary",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "examples/lightroom/Info.lua",
-      "purpose": "Lightroom plugin Info.lua stub",
-      "read_when": "stack_selection",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "examples/lightroom/README.md",
-      "purpose": "Lightroom SDK version and compliance notes",
-      "read_when": "stack_selection",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "modules/rust/MODULE.md",
-      "purpose": "Optional Rust module guide",
-      "read_when": "stack_selection",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "examples/rust/Cargo.toml",
-      "purpose": "Rust hello-world stub manifest",
-      "read_when": "stack_selection",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "modules/go/MODULE.md",
-      "purpose": "Optional Go module guide",
-      "read_when": "stack_selection",
-      "update_when": "milestone_boundary",
-      "owner": "maintainer"
-    },
-    {
-      "path": "examples/go/go.mod",
-      "purpose": "Go hello-world stub module",
-      "read_when": "stack_selection",
       "update_when": "milestone_boundary",
       "owner": "maintainer"
     },
@@ -1292,35 +1250,10 @@
     }
   ],
   "modules": {
-    "android": {
-      "guide": "modules/android/MODULE.md",
-      "example": "examples/android",
-      "activate_when": "stack includes Android or F-Droid"
-    },
     "web": {
       "guide": "modules/web/MODULE.md",
       "example": "examples/web",
       "activate_when": "stack includes PWA, web, or static site"
-    },
-    "python": {
-      "guide": "modules/python/MODULE.md",
-      "example": "examples/python",
-      "activate_when": "stack includes Python application"
-    },
-    "lightroom": {
-      "guide": "modules/lightroom/MODULE.md",
-      "example": "examples/lightroom",
-      "activate_when": "stack includes Adobe Lightroom Classic plugin"
-    },
-    "rust": {
-      "guide": "modules/rust/MODULE.md",
-      "example": "examples/rust",
-      "activate_when": "optional stack; see docs/OPTIONAL_STACKS.md"
-    },
-    "go": {
-      "guide": "modules/go/MODULE.md",
-      "example": "examples/go",
-      "activate_when": "optional stack; see docs/OPTIONAL_STACKS.md"
     },
     "node": {
       "guide": "modules/node/MODULE.md",
@@ -1329,7 +1262,7 @@
     }
   },
   "roadmap": {
-    "active": "BUILD_PLAN.md — maintenance + human open items",
+    "active": "BUILD_PLAN.md \u2014 maintenance + human open items",
     "completed_archive": "COMPLETED_TASKS.md",
     "batch_commands": [
       ".cursor/commands/audit.md",

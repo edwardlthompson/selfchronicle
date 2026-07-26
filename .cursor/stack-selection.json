@@ -1,6 +1,14 @@
 {
+  "stack": "web+node",
+  "pruned": true,
+  "active_modules": [
+    "web",
+    "node"
+  ],
+  "parallel_scope_note": "Primary: examples/web (PWA). Secondary: examples/node (MCP host). One agent per stack; no overlapping paths.",
+  "selected_at": "2026-07-26T06:04:18+00:00",
   "distribution_tier": "foss",
-  "stack": "multi",
+  "product_name": "SelfChronicle",
   "cursor_features_enabled": [
     "rules",
     "commands",
@@ -25,5 +33,6 @@
     "mcp_commercial_example",
     "android_commercial_patterns"
   ],
-  "cursor_features_synced_at": "2026-07-21T14:13:48+00:00"
+  "notes": "SelfChronicle: PWA primary + Node MCP. Android/Capacitor/TWA deferred. Python/Android/Rust/Go/Lightroom pruned.",
+  "cursor_features_synced_at": "2026-07-26T14:44:18+00:00"
 }

@@ -16,6 +16,7 @@ export default defineConfig({
         "src/settings/preferences.ts",
         "src/appBootstrap.ts",
         "src/greet.ts",
+        "src/shell/vaultUi.ts",
       ],
       thresholds: {
         lines: 90,

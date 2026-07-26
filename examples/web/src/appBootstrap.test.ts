@@ -36,6 +36,70 @@ vi.mock("./about/applyUpdate", () => ({
   applyPwaUpdate: vi.fn(() => Promise.resolve(true)),
 }));
 
+vi.mock("./shell/vaultSession", () => ({
+  startVaultSession: vi.fn(),
+}));
+
+const vaultMocks = {
+  open: vi.fn(async () => ({
+    open: true,
+    rootLabel: "memory://test",
+    meta: { id: "sc_va_1", schema_version: 1, created_at: "2026-07-26T00:00:00Z" },
+    evidenceCount: 0,
+    indexReady: true,
+  })),
+  status: vi.fn(async () => ({
+    open: true,
+    rootLabel: "memory://test",
+    meta: { id: "sc_va_1", schema_version: 1, created_at: "2026-07-26T00:00:00Z" },
+    evidenceCount: 1,
+    indexReady: true,
+  })),
+  listEvidence: vi.fn(async () => []),
+  appendEvidence: vi.fn(async (input: { title: string; body: string }) => ({
+    frontmatter: {
+      id: "sc_ev_1",
+      type: "evidence" as const,
+      title: input.title,
+      created_at: "2026-07-26T00:00:00Z",
+      updated_at: "2026-07-26T00:00:00Z",
+      ingested_at: "2026-07-26T00:00:00Z",
+      tags: [],
+      status: "active" as const,
+      user_edited: true,
+      provenance: { source: "manual" as const },
+      links: { evidence: [], facts: [], attachments: [] },
+    },
+    body: input.body,
+    path: "evidence/2026/07/26/sc_ev_1.md",
+  })),
+  getById: vi.fn(async () => null),
+  rebuildIndex: vi.fn(async () => ({ indexed: 0 })),
+  search: vi.fn(async () => []),
+};
+
+Object.assign(vaultMocks, {
+  upsertLayer: vi.fn(async () => ({
+    frontmatter: { id: "sc_fa_1", type: "fact", title: "t" },
+    body: "",
+    path: "facts/x.md",
+  })),
+  listLayer: vi.fn(async () => []),
+  readLayer: vi.fn(() => undefined),
+  writeLayer: vi.fn(async () => undefined),
+  listAllDocs: vi.fn(async () => []),
+  onThisDay: vi.fn(async () => []),
+});
+
+vi.mock("./vault", () => ({
+  MemoryVault: vi.fn(function MemoryVault(this: unknown) {
+    return vaultMocks;
+  }),
+  ProfileVault: vi.fn(function ProfileVault(this: unknown) {
+    return vaultMocks;
+  }),
+}));
+
 import { applyPwaUpdate } from "./about/applyUpdate";
 import { createAppShell } from "./AppShell";
 
@@ -56,6 +120,7 @@ describe("bootstrapApp", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     handlers = undefined;
+    vaultMocks.listEvidence.mockResolvedValue([]);
     mockedCreateAppShell.mockImplementation((_root, _state, h) => {
       handlers = h;
     });
@@ -196,7 +261,11 @@ describe("bootstrapApp", () => {
       `${messages["about.update.available"]}: 99.0.0`,
     );
     requireHandlers().onUpdateCheckChange?.(true);
-    await vi.waitFor(() => expect(handlers?.canApplyUpdate).toBe(true));
+    await vi.waitFor(() =>
+      expect(
+        mockedCreateAppShell.mock.calls.some(([, , h]) => h.canApplyUpdate === true),
+      ).toBe(true),
+    );
   });
 
   it("applies PWA update through service worker registration", async () => {
@@ -254,5 +323,58 @@ describe("bootstrapApp", () => {
     await vi.waitFor(() => expect(handlers).toBeDefined());
     requireHandlers().onApplyUpdate?.();
     await vi.waitFor(() => expect(mockedApplyPwaUpdate).not.toHaveBeenCalled());
+  });
+
+  it("saves a note to the vault and refreshes recent evidence", async () => {
+    vaultMocks.listEvidence.mockResolvedValue([
+      {
+        frontmatter: {
+          id: "sc_ev_1",
+          type: "evidence",
+          title: "Hello vault",
+          created_at: "2026-07-26T00:00:00Z",
+          updated_at: "2026-07-26T00:00:00Z",
+          ingested_at: "2026-07-26T00:00:00Z",
+          tags: ["journal"],
+          status: "active",
+          user_edited: true,
+          provenance: { source: "manual" },
+          links: { evidence: [], facts: [], attachments: [] },
+        },
+        body: "Hello vault",
+        path: "evidence/2026/07/26/sc_ev_1.md",
+      },
+    ]);
+    const root = document.createElement("div");
+    bootstrapApp(root);
+    await vi.waitFor(() => expect(handlers).toBeDefined());
+    requireHandlers().onSaveNote?.("Hello vault");
+    await vi.waitFor(() => expect(vaultMocks.appendEvidence).toHaveBeenCalled());
+    await vi.waitFor(() =>
+      expect(
+        mockedCreateAppShell.mock.calls.some(
+          ([, state]) => state.today.message === messages["today.saved"],
+        ),
+      ).toBe(true),
+    );
+  });
+
+  it("ignores empty note saves", async () => {
+    const root = document.createElement("div");
+    bootstrapApp(root);
+    await vi.waitFor(() => expect(handlers).toBeDefined());
+    requireHandlers().onSaveNote?.("   ");
+    expect(vaultMocks.appendEvidence).not.toHaveBeenCalled();
+  });
+
+  it("updates route on navigate", async () => {
+    const root = document.createElement("div");
+    bootstrapApp(root);
+    await vi.waitFor(() => expect(handlers).toBeDefined());
+    requireHandlers().onNavigate?.("vault");
+    requireHandlers().onState({ route: "vault" });
+    expect(
+      mockedCreateAppShell.mock.calls.some(([, state]) => state.route === "vault"),
+    ).toBe(true);
   });
 });

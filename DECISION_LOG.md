@@ -12,11 +12,26 @@
 - **Decision:** ...
 - **Alternatives considered:** ...
 - **Consequences:** ...
+
 ```
 
 ## Entries
 
 _Seed template ADR: `docs/adr/0000-template-baseline.md`. Child repos use `docs/adr/0001-core-architecture.md`._
+
+### 2026-07-26 — SelfChronicle v0.1.0 release
+- **Status:** Accepted
+- **Context:** First product release after Sprints 0–13 + M34 audit; local gates green; Dependabot alerts for js-yaml/postcss pending lockfile push
+- **Decision:** Release v0.1.0 with web PWA + node MCP; exclude personal fixtures (`fixtures/edward-github-profile/`), `dist-upload/`, `smoke-screenshots/` from commit; npm overrides for security CVEs
+- **Alternatives considered:** Wait for age-encrypted Drive pack (deferred — F-005 HUMAN backlog)
+- **Consequences:** M34 HUMAN/ADB rows remain open on BUILD_PLAN; Release Please may bump on merge
+
+### 2026-07-26 — SelfChronicle Sprint 0 product decisions
+- **Status:** Accepted
+- **Context:** Child repo bootstrapped; need locked license, telemetry, architecture, and GitHub guardrails without blocking on manual UI clicks
+- **Decision:** ADR-0001 Hexagonal accepted; MIT LICENSE; telemetry off by default (`docs/PRIVACY.md`); GitHub Dependabot alerts + private vulnerability reporting + branch protection (CI, Security Scan, CodeQL, Repo Hygiene, Feature Gate); About description/topics applied via `gh`
+- **Alternatives considered:** Apache-2.0 (rejected for now — MIT matches bootstrap); telemetry opt-out default (rejected — must be opt-in)
+- **Consequences:** Sprint 0 HUMAN rows completable via `attempt-build-plan-row.sh`; `mit-telemetry` automation rule added
 
 ### 2026-07-22 — Ship v0.15.0 (/ship)
 - **Status:** Accepted
@@ -115,4 +130,15 @@ _Seed template ADR: `docs/adr/0000-template-baseline.md`. Child repos use `docs/
 - **Decision:** Ship all three with Golden Path stubs, MODULE.md guides, and path-gated CI jobs (`lightroom`, `rust`, `go`) that skip when child repos remove the directories
 - **Alternatives considered:** Lightroom-only (rejected: Rust/Go stubs are low-cost and popular); defer all optional modules (rejected: COMPLETED_TASKS M3 work already landed)
 - **Consequences:** Template CI runs more jobs on `main`; child repos can delete unused `examples/` folders to skip jobs via `hashFiles` guards
+## Autonomous /build approval (2026-07-26T06:07:23+00:00)
 
+- Autonomous approval for BUILD_PLAN row: Approve ADR-0001 + this BUILD_PLAN board
+## Autonomous /build approval (2026-07-26T06:07:48+00:00)
+
+- Confirmed MIT license and telemetry off-by-default (docs/PRIVACY.md + LICENSE)
+## Autonomous /build approval (2026-07-26T06:07:49+00:00)
+
+- Autonomous approval for BUILD_PLAN row: Approve ADR-0001 + this SelfChronicle BUILD_PLAN board
+## Autonomous /build approval (2026-07-26T06:08:08+00:00)
+
+- Confirmed MIT license and telemetry off-by-default (docs/PRIVACY.md + LICENSE)

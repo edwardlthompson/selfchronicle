@@ -1,4 +1,4 @@
-const CACHE_NAME = "golden-path-v__APP_VERSION__";
+const CACHE_NAME = "selfchronicle-v__APP_VERSION__";
 const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -17,6 +17,9 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  // Debug adb-reverse seed server — bypass offline cache (see debug/seedImport.ts).
+  if (url.hostname === "127.0.0.1" && url.port === "9999") return;
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
