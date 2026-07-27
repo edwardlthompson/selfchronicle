@@ -19,6 +19,13 @@
 
 _Seed template ADR: `docs/adr/0000-template-baseline.md`. Child repos use `docs/adr/0001-core-architecture.md`._
 
+### 2026-07-26 — M35 audit ship (/ship → v0.18.0)
+- **Status:** Accepted
+- **Context:** M35 audit left uncommitted AGENT fixes (IdentityHeader → identityForm split, README accuracy); v0.17.0 already on GitHub via Release Please PR #7; local main behind origin
+- **Decision:** Commit M35 fixes with explicit paths only; rebase on origin/main; push to trigger Release Please 0.18.0; exclude personal fixtures, dist-upload, smoke-screenshots, session state
+- **Alternatives considered:** Manual tag v0.17.1 (rejected — Release Please owns semver); force-push (rejected)
+- **Consequences:** M35 HUMAN/AUTO rows remain on BUILD_PLAN; AGENT_MEMORY + COMPLETED_TASKS updated
+
 ### 2026-07-26 — SelfChronicle v0.1.0 release
 - **Status:** Accepted
 - **Context:** First product release after Sprints 0–13 + M34 audit; local gates green; Dependabot alerts for js-yaml/postcss pending lockfile push

@@ -2,6 +2,12 @@
 
 > Archive of finished BUILD_PLAN items.
 
+## Sprint M35 — Audit 2026-07-26
+
+- ✅ [AGENT] Fix F-001 — split `IdentityHeader.ts` form into `identityForm.ts` (150-line budget)
+- ✅ [AGENT] Fix F-003 — README: memory disclosure, IMDb enrich, bio chips, Composio vs in-app GIS
+- ✅ [AUTO] Gates: `watch-agent-gates --once --autofix` green post-fix
+
 ## Sprint M34 — Audit 2026-07-26
 
 - ✅ [AGENT] Fix F-001 — extend `appBootstrap.test.ts` vault mocks with `readLayer`/`writeLayer` for bioVault integration

@@ -74,14 +74,15 @@ grep '\[AUTO\]' BUILD_PLAN.md
 
 > Product: privacy-first local memory & living biography. Stack: web/PWA + node (MCP). Refs: `docs/ARCHITECTURE.md`, `DATA_MODEL.md`, `UX_FLOWS.md`, `SCREEN_INVENTORY.md`, `IMPORT_PIPELINE.md`, `MCP_HANDOFF.md`, `PRIVACY.md`, `SECURITY.md`.
 
-### Sprint M34 — Audit 2026-07-26 (open follow-ups)
+### Sprint M35 — Audit 2026-07-26 (open follow-ups)
 
-<!-- parallel_exception: M34 follow-ups are HUMAN/ADB only — no AGENT Parallel rows -->
+<!-- parallel_exception: M35 follow-ups are HUMAN/ADB/AUTO only — no AGENT Parallel rows -->
 
-> **M34** AGENT/AUTO work archived in `COMPLETED_TASKS.md` @ `b81412a`. Findings: `CODE_REVIEW.md`.
+> **M35** AGENT work archived in `COMPLETED_TASKS.md` @ `28ec38b`. Findings: `CODE_REVIEW.md`. (Supersedes M34 open follow-ups.)
 
-- 🔲 [HUMAN] F-005 — Prioritize age-encrypted Drive vault pack (`DRIVE_PACK_CLEARTEXT` → false); UX warning until shipped
-- 🔲 [ADB] F-007 — Review Capacitor Android `allowBackup` vs vault privacy defaults
+- 🔲 [HUMAN] F-002 — Prioritize age-encrypted Drive vault pack (`DRIVE_PACK_CLEARTEXT` → false); UX warning until shipped
+- 🔲 [ADB] F-006 — Review Capacitor Android `allowBackup` vs vault privacy defaults
+- 🔲 [AUTO] F-004 — Triage OpenSSF Scorecard CodeQL (pinned-deps, token-permissions)
 
 ### Risks & mitigations (board reminder)
 
@@ -163,6 +164,7 @@ grep '\[AUTO\]' BUILD_PLAN.md
 
 | Sprint                                                            | Status   | Archive                          |
 | ----------------------------------------------------------------- | -------- | -------------------------------- |
+| M35 — Audit 2026-07-26 (AGENT)                                    | Partial  | `COMPLETED_TASKS.md` @ `28ec38b` |
 | M34 — Audit 2026-07-26                                            | Complete | `COMPLETED_TASKS.md` @ `b81412a` |
 | SelfChronicle Sprints 0–5 (P0)                                    | Complete | `COMPLETED_TASKS.md` @ `b81412a` |
 | Sprint 6 — Distillation / soft layers / Learning                  | Complete | `COMPLETED_TASKS.md` @ `b81412a` |

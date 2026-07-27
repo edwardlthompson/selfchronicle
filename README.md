@@ -14,8 +14,9 @@ FOSS under **MIT**. Primary client: installable **PWA** (`examples/web/`) plus a
 | **Local vault** | Markdown Evidence + Facts + Biography layers. **IndexedDB** persistence survives restarts; `ProfileVault` auto-flushes after writes. |
 | **Import** | Parse → review → commit into one unified vault. All imports land in the same Evidence store with provenance tags (`import`, adapter name, `provisional`). |
 | **Welcome outlets** | Public GitHub username fetch · personal site URL (**pointer only—no scrape**) · Drive pack JSON · ChatGPT/Claude paste · manual paste · full import catalog (Grok, Gemini takeout, WhatsApp, etc.) |
-| **Profile** | Living Biography, Key Facts, On This Day, Insights, Audit search, Life Timeline |
-| **Google Drive sync** | Optional. Sign in from Settings; pack at `SelfChronicle/vault-pack.json`; merge is union-by-path, newer `updated_at` wins. Requires `VITE_GOOGLE_CLIENT_ID` (see below). |
+| **Profile** | Living Biography, compact **bio chips** (occupations/passions), Key Facts, On This Day, Insights, Audit search, Life Timeline |
+| **Identity enrich** | User-initiated **IMDb/public page enrich** from linked URLs (Profile or Welcome). Consent-first; may fail in-browser (CORS) — link inference still works offline. |
+| **Google Drive sync (in-app)** | Optional **Google Identity Services OAuth** from Settings; pack at `SelfChronicle/vault-pack.json`; merge is union-by-path, newer `updated_at` wins. Requires `VITE_GOOGLE_CLIENT_ID` (see below). **Not** the same as external Composio/MCP Drive backup tooling. |
 | **Android** | Debug APK via Capacitor after `npm run build` — see [Android debug build](#android-debug-build). |
 ### Import sources (summary)
 
@@ -24,6 +25,7 @@ FOSS under **MIT**. Primary client: installable **PWA** (`examples/web/`) plus a
 - **Drive pack** — paste or upload `vault-pack.json` (same shape as Drive sync).
 - **ChatGPT / Claude** — paste official export JSON.
 - **Grok / xAI** — paste JSON from an export you **unzip first** (`grok_json_v2`; e.g. pick `prod-grok-backend.json` or a smaller pack). No in-app ZIP import.
+- **LLM memory disclosure** — paste or pick a Grok/Gemini **Memory Disclosure Report** `.md`; review-before-commit into Evidence with provenance tags.
 - **Manual paste** — any text; review before commit.
 - **Import screen** — additional adapters (Gemini takeout, Gmail, WhatsApp, Meta, Discord, Slack, …) with export how-to links.
 
@@ -33,8 +35,10 @@ Do not expect these yet:
 
 - **No silent scraping** of personal sites or chats—exports and explicit paste only.
 - **No default personal seed** in production builds (debug-only `VITE_DEBUG_SEED_IMPORT` / `?debugSeed=adb-reverse` for dev).
-- **Drive sync is cleartext JSON** today—encryption (`age` packs) is planned, not shipped.
-- **Drive does nothing** until you configure a Google OAuth Web client ID.
+- **Drive sync is cleartext JSON** today—encryption (`age` packs) is planned, not shipped (Settings shows a provisional warning).
+- **Drive does nothing** until you configure a Google OAuth Web client ID for in-app GIS sign-in.
+- **External MCP/Composio Drive backup** is separate from in-app sync—different auth path and not wired to `ProfileVault` merge.
+- **IMDb enrich** requires explicit user action; fetches can fail in-browser (CORS).
 - **Grok ZIP** must be unzipped on your machine before import.
 
 Roadmap and sprint board: [`BUILD_PLAN.md`](BUILD_PLAN.md).
