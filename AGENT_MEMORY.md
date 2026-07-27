@@ -59,6 +59,6 @@ SelfChronicle: privacy-first local memory & living biography — Evidence → Fa
 ## Template Provenance
 
 - **Source template:** `edwardlthompson/agent-project-bootstrap`
-- **Template version:** `0.17.0` (see `.template-version`; Release Please bumps on merge)
+- **Template version:** `0.17.1` (see `.template-version`; Release Please bumps on merge)
 - **Child repo:** `edwardlthompson/selfchronicle`
 - **Last update check:** See `.template-update.json`
