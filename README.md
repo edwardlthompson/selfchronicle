@@ -140,3 +140,10 @@ npm run dev
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## What this is not
+
+- A finished commercial product promise
+- A place for secrets or production credentials
+- An unbounded scope — see README goals above
+
