@@ -15,6 +15,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.2](https://github.com/edwardlthompson/selfchronicle/compare/v0.17.1...v0.17.2) (2026-11-05)
+
+
+### Changed
+
+* **argus:** Add canonical portfolio app icon ([d5506af](https://github.com/edwardlthompson/selfchronicle/commit/d5506af2374b40a1b2173d8fbebe9b6aeed9d2b6))
+* **argus:** Add missing parent-lineage marker files ([1d3851d](https://github.com/edwardlthompson/selfchronicle/commit/1d3851dbce0a307556d3ebc0d7e506d9f7f3939a))
+* **argus:** Add or improve a "What this is not" section ([0021d90](https://github.com/edwardlthompson/selfchronicle/commit/0021d906d57bdd8bdec9bb78d8cc3942b57ac316))
+* **argus:** Bump .template-version toward parent ([5c340a4](https://github.com/edwardlthompson/selfchronicle/commit/5c340a49833551c0eaf0ef38209ef4f46262aca3))
+* **argus:** Move agent memory/log files into .agent/ ([32b0005](https://github.com/edwardlthompson/selfchronicle/commit/32b00057ee2bcce3cf95ec28b87427d6b904ef7e))
+
 ## [0.17.1](https://github.com/edwardlthompson/selfchronicle/compare/v0.17.0...v0.17.1) (2026-07-27)
 
 
